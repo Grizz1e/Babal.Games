@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Buy {{game.display_name}} at Babal.Games
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" href="https://unpkg.com/slider-pro/dist/css/slider-pro.min.css" />
+<style>
+    .sp-buttons {
+        display: block;
+    }
+
+    .sp-selected-button {
+        background-color: white;
+    }
+
+    .sp-button {
+        border: 2px solid white;
+    }
+
+    @media (min-width: 1024px) {
+        .sp-buttons {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="mx-auto max-w-7xl px-8 py-2">
+        <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
+            <div class="container">
+                <h2 class="text-2xl mt-6 mb-4">{{game.display_name}}</h2>
+                <div class="stars">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container grid lg:grid-cols-2 gap-20">
+            <div class="slider-pro" id="my-slider">
+                <div class="sp-slides">
+                    <!-- Slide 1 -->
+                    <div class="sp-slide cursor-pointer">
+                        <img class="sp-image w-min" src="/media/{{game.banner}}" />
+                    </div>
+                    {% for screenshot in screenshots %}
+                    <div class="sp-slide cursor-pointer">
+                        <img class="sp-image" src="/media/{{screenshot.image}}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="sp-thumbnails hidden lg:block">
+                    <img class="sp-thumbnail cursor-pointer" src="/media/{{game.banner}}" />
+                    {% for screenshot in screenshots %}
+                    <img class="sp-thumbnail cursor-pointer" src="/media/{{screenshot.image}}">
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="game-info w-40">
+                <h1>Hello there</h1>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="https://unpkg.com/slider-pro/dist/js/jquery.sliderPro.min.js"></script>
+<script type="text/javascript">
+    $('#my-slider').sliderPro({
+        width: 720,
+        height: 420,
+        arrows: false,
+        buttons: true,
+        fullScreen: false,
+        shuffle: false,
+        smallSize: 500,
+        mediumSize: 1000,
+        largeSize: 3000,
+        thumbnailArrows: true,
+        autoplay: false
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<p>{{basket_price}}</p>
+<form action="{% url 'create_order' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">
+        Pay with Khalti
+    </button>
+</form>
+{% endblock %}
