@@ -1,0 +1,76 @@
+{% extends 'core/profile_base.html' %}
+{% load custom_tag %}
+{% block title %}{{user.username}}'s Wishlist | Babal.Games{% endblock %}
+    {% block profile_content %}
+    <div class="w-full mt-4 gap-4">
+        <div class="flex justify-end gap-4">
+            <form class="flex m-0 gap-2">
+                <div class="flex items-center gap-2">
+                    <p class="text-gray-300">Sort by:</p>
+                    <select name="sort" id="sort" class="bg-gray-800 rounded p-2">
+                        <option value="price">Price</option>
+                        <option value="display_name">Name</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p class="text-gray-300">Order:</p>
+                    <select name="order" id="order" class="bg-gray-800 rounded p-2">
+                        <option value="+">Ascending</option>
+                        <option value="-">Descending</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        {% for game in wishlisted_games %}
+        <div class="bg-gray-800 mt-2 rounded p-4">
+            <div class="flex justify-between">
+                <div class="flex gap-4 items-center">
+                    <i class="r-wl-btn ph-fill ph-heart-straight text-2xl text-primary hover:text-red-400"></i>
+                    <div class="flex items-center gap-2">
+                        <img src="{{game.banner.url}}" alt="{{game.display_name}}" loading="lazy" class="rounded w-28 aspect-2 object-cover">
+                        <p class="text-gray-300">{{game.display_name}}</p>
+                    </div>
+                </div>
+                {% comment %} <div class="flex gap-5 justify-center items-center"> {% endcomment %}
+                    <div class="pricing flex items-center gap-4 leading-4">
+                        {% if game.discount_amount != 0 %}
+                        <a class="bg-gray-700 p-2">-{{ game.discount_amount |percent_round:game.price }}%</a>
+                        {% endif %}
+                        <div class="flex flex-col text-right lg:min-w-24">
+                            {% if game.discount_amount != 0 %}
+                            <h2 class="line-through text-[0.8rem]">Rs. {{game.price}}</h2>
+                            {% endif %}
+                            <h2 class="text-primary font-bold">Rs. {{ game.price |subtract:game.discount_amount }}
+                            </h2>
+                        </div>
+                        <form action="{% url 'wishlist_to_basket' game.id %}" method="post" class="m-0">
+                            {% csrf_token %}
+                            <button class="text-2xl text-gray-400 hover:text-primary">
+                                <i class="ph-bold ph-basket"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% comment %} </div> {% endcomment %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+    {% block tab_highlight %}
+    <script type="text/javascript">
+        $('.wishlist-tab').addClass('text-white')
+        $('.wishlist-tab-icon').addClass('text-secondary')
+    </script>
+
+    <script type="text/javascript">
+        $('.r-wl-btn').on('mouseover', function() {
+            $(this).removeClass('ph-fill').addClass('ph-bold')
+        })
+        $('.r-wl-btn').on('mouseleave', function() {
+            $(this).removeClass('ph-bold').addClass('ph-fill')
+        })
+        $('.r-wl-btn').on('click', function() {
+            $(this).parent().parent().parent().remove()
+        })
+    </script>
+    {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load custom_tag %}
 
 {% block title %}
 Buy {{game.display_name}} at Babal.Games
@@ -20,6 +21,10 @@ Buy {{game.display_name}} at Babal.Games
         border: 2px solid white;
     }
 
+    .ytp-cued-thumbnail-overlay, .ytp-cued-thumbnail-overlay-image, .sp-slide, iframe {
+        z-index: -1 !important;
+    }
+
     @media (min-width: 1024px) {
         .sp-buttons {
             display: none;
@@ -29,21 +34,26 @@ Buy {{game.display_name}} at Babal.Games
 {% endblock %}
 
 {% block content %}
-<section class="container">
+<section class="container mt-10">
     <div class="mx-auto max-w-7xl px-8 py-2">
-        <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
+        {% comment %} <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
             <div class="container">
                 <h2 class="text-2xl mt-6 mb-4">{{game.display_name}}</h2>
                 <div class="stars">
 
                 </div>
             </div>
-        </div>
+        </div> {% endcomment %}
 
-        <div class="container grid lg:grid-cols-2 gap-20">
+        <div class="container flex flex-col lg:flex-row gap-4">
             <div class="slider-pro" id="my-slider">
                 <div class="sp-slides">
                     <!-- Slide 1 -->
+                    {% if game.yt_trailer_id != "" %}
+                    <div class="sp-slide cursor-pointer">
+                        <iframe class="h-full w-full" class="sp-image w-min" src="https://www.youtube.com/embed/{{game.yt_trailer_id}}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+                    </div>
+                    {% endif %}
                     <div class="sp-slide cursor-pointer">
                         <img class="sp-image w-min" src="/media/{{game.banner}}" />
                     </div>
@@ -54,14 +64,178 @@ Buy {{game.display_name}} at Babal.Games
                     {% endfor %}
                 </div>
                 <div class="sp-thumbnails hidden lg:block">
+                    {% if game.yt_trailer_id != "" %}
+                    <img class="sp-thumbnail cursor-pointer" class="sp-image w-min" src="https://img.youtube.com/vi/{{game.yt_trailer_id}}/maxresdefault.jpg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+                    {% endif %}
                     <img class="sp-thumbnail cursor-pointer" src="/media/{{game.banner}}" />
                     {% for screenshot in screenshots %}
                     <img class="sp-thumbnail cursor-pointer" src="/media/{{screenshot.image}}">
                     {% endfor %}
                 </div>
             </div>
-            <div class="game-info w-40">
-                <h1>Hello there</h1>
+            <div class="flex flex-col items-center w-full lg:w-96 bg-gray-800 p-4 rounded text-gray-300 h-max">
+                <h1 class="w-full text-xl text-primary font-bold grid grid-cols-2"><span>{{game.display_name}}</span><span class="text-right">Rs. {{game.price |subtract:game.discount_amount}}</span></h1>
+                <div class="stars w-full mb-4 text-yellow-400 flex items-center gap-1">
+                    <!-- 1 star -->
+                    {% if rating.average >= 1 %}
+                    <i class="ph-fill ph-star"></i>
+                    {% elif rating.average > 0 %}
+                    <i class="ph-fill ph-star-half"></i>
+                    {% else %}
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                    <!-- 2 star -->
+                    {% if rating.average >= 2 %}
+                    <i class="ph-fill ph-star"></i>
+                    {% elif rating.average > 1 %}
+                    <i class="ph-fill ph-star-half"></i>
+                    {% else %}
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                    <!-- 3 star -->
+                    {% if rating.average >= 3 %}
+                    <i class="ph-fill ph-star"></i>
+                    {% elif rating.average > 2 %}
+                    <i class="ph-fill ph-star-half"></i>
+                    {% else %}
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                    <!-- 4 star -->
+                    {% if rating.average >= 4 %}
+                    <i class="ph-fill ph-star"></i>
+                    {% elif rating.average > 3 %}
+                    <i class="ph-fill ph-star-half"></i>
+                    {% else %}
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                    <!-- 5 star -->
+                    {% if rating.average == 5 %}
+                    <i class="ph-fill ph-star"></i>
+                    {% elif rating.average > 4 %}
+                    <i class="ph-fill ph-star-half"></i>
+                    {% else %}
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                    <div class="average-rating text-gray-300">{{rating.average}} out
+                        of 5</div>
+                    <div class="total-ratings text-gray-400">({{rating.total}})</div>
+                </div>
+                <p class="leading-5 text-gray-400 mb-2 w-full"><span class="game-desc">{{game.description|truncatechars:200}}</span>
+                    {% if game.description|length > 200 %}
+                    <span id="desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</span>
+                    {% endif %}
+                </p>
+
+                <p class="flex justify-start w-full">
+                    {% for genre in genres %}
+                    <span class="bg-gray-700 hover:bg-gray-600 text-gray-400 mx-2 rounded-lg px-2">
+                        {{genre}}
+                    </span>
+                    {% endfor %}
+                </p>
+                <div class="flex flex-col w-full mb-10 mt-4">
+                    <p class="grid grid-cols-2 text-primary">
+                        <span>Developer</span> <span>Rockstar Games</span>
+                    </p>
+                    <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1">
+                    <p class="grid grid-cols-2 text-primary">
+                        <span>Publisher</span> <span>Rockstar Games</span>
+                    </p>
+                    <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1">
+                    <p class="grid grid-cols-2 text-primary">
+                        <span>Support</span> <span>Website</span>
+                    </p>
+                </div>
+
+                <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full mt-4 flex gap-1">
+                    {% csrf_token %}
+                    <button type="button"
+                        class="bg-gray-700 w-10 rounded text-primary">
+                        {% if game in wishlisted_games %}
+                        <i class="ph-fill ph-heart-straight"></i>
+                        {% else %}
+                        <i class="ph-bold ph-heart-straight"></i>
+                        {% endif %}
+                    </button>
+                    <button type="submit"
+                        class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add
+                        to basket</button>
+                </form>
+            </div>
+        </div>
+        <div class="w-1/2">
+            <div class="my-6 container game-info">
+                <h1 class="text-primary text-2xl mb-4 font-bold">About the Game</h1>
+                <p class="text-gray-200 game-long-desc">
+                    {{game.long_description|truncatechars:400|linebreaksbr}}
+                    {% if game.long_description|length > 400 %}
+                        <button id="long-desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</button>
+                    {% endif %}
+                </p>
+                <h1 class="text-primary text-2xl mb-4 font-bold mt-8">System Requirements</h1>
+                <div class="grid grid-cols-2 gap-0">
+                    <div class="minimum">
+                        <h3 class="uppercase font-bold">Minimum</h3>
+                        <p><span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">Windows 10 64 Bit</span></p>
+                        <p><span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz</span></p>
+                        <p><span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">4 GB RAM</span></p>
+                        <p><span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">NVIDIA 9800 GT 1GB / AMD HD 4870 1GB (DX 10, 10.1, 11)</span></p>
+                        <p><span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">120 GB available space</span></p>
+                    </div>
+                    <div class="recommended">
+                        <h3 class="uppercase font-bold">Recommended</h3>
+                        <p><span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">Windows 10 64 Bit</span></p>
+                        <p><span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">Intel Core i5 3470 @ 3.2GHz (4 CPUs) / AMD X8 FX-8350 @ 4GHz (8 CPUs)</span></p>
+                        <p><span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">8 GB RAM</span></p>
+                        <p><span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">NVIDIA GTX 660 2GB / AMD HD 7870 2GB</span></p>
+                        <p><span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">120 GB available space</span></p>
+                    </div>
+                </div>
+                <h1 class="text-primary text-2xl mb-4 mt-8 font-bold">Reviews</h1>
+                {% if reviews.count < 1 %}
+                <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+                    <span class="text-xl text-black"><i class="ph ph-warning"></i> No reviews available for this game!</span>
+                </div>
+                {% endif %}
+                {% for review in reviews %}
+                <div class="bg-gray-800 p-4 rounded">
+                    <div class="flex justify-between items-center">
+                        <p class="text-primary text-xl">{{review.reviewer.username}}</p>
+                        <div class="stars text-yellow-400 flex items-center gap-1">
+                            <!-- 1 star -->
+                            <i class="ph-fill ph-star"></i>
+                            <!-- 2 star -->
+                            {% if review.rating >= 2 %}
+                            <i class="ph-fill ph-star"></i>
+                            {% else %}
+                            <i class="ph-bold ph-star"></i>
+                            {% endif %}
+                            <!-- 3 star -->
+                            {% if review.rating >= 3 %}
+                            <i class="ph-fill ph-star"></i>
+                            {% else %}
+                            <i class="ph-bold ph-star"></i>
+                            {% endif %}
+                            <!-- 4 star -->
+                            {% if review.rating >= 4 %}
+                            <i class="ph-fill ph-star"></i>
+                            {% else %}
+                            <i class="ph-bold ph-star"></i>
+                            {% endif %}
+                            <!-- 5 star -->
+                            {% if review.rating == 5 %}
+                            <i class="ph-fill ph-star"></i>
+                            {% else %}
+                            <i class="ph-bold ph-star"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="text-gray-300">{{review.review}}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="similar-games">
+                {% comment %} Work needs to be done here {% endcomment %}
             </div>
         </div>
 
@@ -70,6 +244,32 @@ Buy {{game.display_name}} at Babal.Games
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript" src="https://unpkg.com/slider-pro/dist/js/jquery.sliderPro.min.js"></script>
+
+<script type="text/javascript">
+    $('#desc-show-more').click(function() {
+        if ($(this).attr('status') == 'closed') {
+            $(this).attr('status', 'open');
+            $(this).text('Show less');
+            $('.game-desc').text(`{{game.description}}`);
+        } else {
+            $(this).attr('status', 'closed');
+            $(this).text('Show more');
+            $('.game-desc').text('{{game.description|truncatechars:200}}');
+        }
+    });
+
+    $('#long-desc-show-more').click(function() {
+        if ($(this).attr('status') == 'closed') {
+            $(this).attr('status', 'open');
+            $(this).text('Show less');
+            $('.game-long-desc').html(`{{game.long_description|linebreaksbr}}`);
+        } else {
+            $(this).attr('status', 'closed');
+            $(this).text('Show more');
+            $('.game-long-desc').html('{{game.long_description|truncatechars:400|linebreaksbr}}');
+        }
+    });
+</script>
 <script type="text/javascript">
     $('#my-slider').sliderPro({
         width: 720,

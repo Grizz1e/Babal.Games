@@ -1,0 +1,63 @@
+{% extends 'core/profile_base.html' %}
+{% load  custom_tag %}
+{% block title %}{{user.username}}'s Game Reviews | Babal.Games{% endblock %}
+
+{% block profile_content %}
+    <div class="container mt-4">
+        {% for review in user_reviews %}
+        <h1 class="mt-4 text-gray-400">{{review.review_date}}</h1>
+        <div class="row">
+            <div class="col-md-12 bg-gray-800 rounded p-4">
+                <div class="flex items-center justify-between text-primary">
+                    <div class="flex gap-2 items-center">
+                        <img src={{review.game.banner.url}} loading="lazy" class="w-20 aspect-2">
+                        <h1>{{review.game.display_name}}</h1>
+                    </div>
+                    <a href="{% url 'gamepage' review.game.slug%}#review" class="border-primary border-2 px-2 py-1 font-bold rounded hover:bg-primary hover:text-gray-800">Update Review</a>
+                </div>
+                <div class="text-yellow-400">
+                    {% if review.rating > 4 %}
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    {% elif review.rating > 3 %}
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    {% elif review.rating > 2 %}
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    {% elif review.rating > 1 %}
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    {% elif review.rating > 0 %}
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    <i class="ph-bold ph-star"></i>
+                    {% endif %}
+                </div>
+                <h1 class="text-gray-300 leading-5 max-w-[40rem]">{{review.review}}</h1>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+    {% block tab_highlight %}
+    <script type="text/javascript">
+        $('.my-reviews-tab').addClass('text-white')
+        $('.my-reviews-tab-icon').addClass('text-secondary')
+    </script>
+    {% endblock %}

@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html class="dark">
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,20 @@
     {% block links %}{% endblock %}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Anta&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
+        * {
+            font-family: "Reddit Sans", sans-serif;
+        }
+        .brand-name span {
+            font-family: "Anta", sans-serif !important;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        #search-result-box {
+            z-index: 100;
+        }
     </style>
 
 </head>
@@ -20,8 +34,8 @@
     <header class=" bg-gray-800">
         <p id="promo-banner"
             class="relative flex h-10 items-center justify-center bg-primary px-4 text-sm font-normal text-black sm:px-6 lg:px-8">
-            Use code <span class="font-medium px-1 hover:cursor-cell group relative inline-block">BABALOFFER
-                <span onclick="copyToClipboard(this)" onmouseout="changeTextContent(this, 'Copy')"
+            Use code <span class="font-medium px-1 hover:cursor-cell group relative inline-block"><span id="promocode">BABALOFFER</span>
+                <span onclick="copyToClipboard(this, '#promocode')" onmouseout="changeTextContent(this, 'Copy')"
                     class="absolute invisible group-hover:visible z-10 bg-primary border-black border-2 px-1 right-1 left-1 text-center">
                     Copy
                 </span>
@@ -58,27 +72,38 @@
 
                     </div>
                     <div class="hidden lg:block">
-                        <form action="" class="h-full mb-0 ml-10 relative">
-                            <input type="text" name="search-box" id="search-field"
+                        <form action="{% url 'resultpage' %}" class="mb-0 ml-10 relative">
+                            <input type="text" name="q" id="search-field"
                                 class="h-10 rounded w-[500px] outline-none text-black indent-5 uppercase placeholder:normal-case"
-                                placeholder="Search your favourite games">
+                                placeholder="Search your favourite games" autocomplete="off">
                             <button type="submit" class="absolute right-2 top-0 bottom-0">
                                 <i class="ph-bold ph-magnifying-glass text-gray-400"></i>
                             </button>
+                            <div id="search-result-box" class="mt-5 absolute p-4 hidden w-full min-h-20 text-black search-result-box top-10 bg-white right-0 left-0 rounded">
+                                <ul class="results">
+                                    <p class="text-gray-400">No results for the given query</p>
+                                </ul>
+                            </div>
                         </form>
                     </div>
 
                     <div class="ml-auto flex items-center">
-                        <a href="#" class="text-primary hover:underline hidden lg:block">SIGN IN</a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'profilepage' %}" class="bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
+                            <i class="ph ph-user"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'authpage' %}" class="text-primary hover:underline hidden lg:block">SIGN IN</a>
+                        {% endif %}
                         <div class="relative hidden items-center justify-center p-3 ml-4 lg:flex">
-                            <a href="#" class="bg-gray-700 hover:bg-gray-600 p-3 rounded">
+                            <a href="{% url 'wishlistpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded">
                                 <i class="ph-fill ph-heart-straight"></i>
                             </a>
                             <span
                                 class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{wishlist_count}}</span>
                         </div>
                         <div class="relative flex items-center justify-center p-3 ml-4">
-                            <a href="#" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex items-center gap-2">
+                            <a href="{% url 'basketpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex items-center gap-2">
                                 <i class="ph-fill ph-basket"></i> <span
                                     class="hidden lg:block text-sm">Rs.{{basket_value}}</span>
                             </a>
@@ -86,6 +111,21 @@
                                 class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{basket_count}}</span>
                         </div>
                     </div>
+                </div>
+                <div class="w-full">
+                    <ul class="genre-list flex w-full justify-between">
+                        <li class="hover:text-primary">Action</li>
+                        <li class="hover:text-primary">Adventure</li>
+                        <li class="hover:text-primary">Anime</li>
+                        <li class="hover:text-primary">FPS</li>
+                        <li class="hover:text-primary">Horror</li>
+                        <li class="hover:text-primary">Indie</li>
+                        <li class="hover:text-primary">Open World</li>
+                        <li class="hover:text-primary">Racing</li>
+                        <li class="hover:text-primary">RPG</li>
+                        <li class="hover:text-primary">Simulation</li>
+                        <li class="hover:text-primary">Sports</li>
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -97,17 +137,80 @@
     {% block scripts %}{% endblock %}
 
     <script type="text/javascript">
-        function copyToClipboard(element) {
-            navigator.clipboard.writeText(element.textContent)
-            element.textContent = "Copied!"
+        if (localStorage.getItem('popupclosed') == 'true') {
+            $('#promo-banner').addClass('hidden')
+        } else {
+            $('promo-banner').removeClass('hidden')
         }
+        function copyToClipboard(element, jQueryId) {
+            navigator.clipboard.writeText($(jQueryId).text());
+            element.textContent = "Copied!";
+        }
+        
         function changeTextContent(element, str) {
-            element.textContent = str
+            element.textContent = str;
         }
+        
         $('#got-it-btn').on('click', function () {
             $('#promo-banner').addClass('hidden')
-        })
+            localStorage.setItem('popupclosed', 'true')
+        });
+        
+        $(document).on('mousedown', function (e) {
+            console.log('mousedown event fired');
+            if (!$(e.target).closest('#search-result-box, #search-field').length) {
+                console.log('Click outside detected');
+                $('#search-result-box').addClass('hidden');
+            }
+        });
+        
+        $('#search-field').on('focusin', function () {
+            console.log('focusin event fired');
+            if ($(this).val().trim().length > 0) {
+                $('#search-result-box').removeClass('hidden');
+            }
+        });
+        
+        $('#search-field').keyup(function () {
+            var data = $(this).val();
+            console.log('Search field keyup event fired with value:', data);
+            if (data.length > 0) {
+                $.ajax({
+                    type: 'GET',
+                    url: `/search?q=${data}`,
+                    success: function (response) {
+                        console.log('AJAX request successful, response:', response);
+                        $('.results').empty();
+                        if (response.length < 1) {
+                            $('.results').append('<p class="text-gray-400">No results for the given query</p>');
+                        } else {
+                            for (let i of response) {
+                                let template = $(`
+                                <li class="flex justify-between items-center p-2 hover:bg-gray-200">
+                                    <a class="flex justify-between items-center w-full" href="/game/${i.fields.slug}">
+                                        <div class="flex gap-2 items-center">
+                                            <img class="rounded" src="http://127.0.0.1:8000/media/${i.fields.banner}" width="50px" height="30px">
+                                            <p class="font-bold">${i.fields.display_name}</p>
+                                        </div>
+                                        <p class="font-bold text-primary">Rs. ${i.fields.price - i.fields.discount_amount}</p>
+                                    </a>
+                                </li>
+                                `);
+                                $('.results').append(template);
+                            }
+                        }
+                        $('#search-result-box').removeClass('hidden');
+                    },
+                    error: function (response) {
+                        console.log('AJAX request error, response:', response);
+                    }
+                });
+            } else {
+                $('#search-result-box').addClass('hidden');
+            }
+        });
     </script>
+    
 </body>
 
 </html>

@@ -1,0 +1,8 @@
+{% extends 'core/profile_base.html' %}
+{% block title %}{{user.username}}'s Settings | Babal.Games{% endblock %}
+    {% block tab_highlight %}
+    <script type="text/javascript">
+        $('.settings-tab').addClass('text-white')
+        $('.settings-tab-icon').addClass('text-secondary')
+    </script>
+    {% endblock %}

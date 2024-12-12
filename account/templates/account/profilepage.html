@@ -1,0 +1,87 @@
+{% extends 'core/profile_base.html' %}
+{% block title %}{{user.username}}'s Profile | Babal.Games{% endblock %}
+{% load custom_tag %}
+{% block profile_content %}
+    <div class="w-full grid lg:grid-cols-2 my-4 gap-4">
+        <div class="grid-left ">
+            <div class="recent-orders bg-gray-800 p-4 rounded">
+                <h1 class="text-2xl flex gap-1 mb-4 items-center text-primary"><i class="ph-bold ph-clipboard-text"></i> Recent Orders</h1>
+                {% if recent_orders.count < 1 %}
+                <h1 class="bg-red-400 p-4 text-lg my-4 rounded text-black flex items-center gap-1"><i class="ph-bold ph-warning"></i>No order history!</h1>
+                {% else %}
+                {% for order in recent_orders %}
+                <div class="order ">
+                    <div class="order-header flex justify-between items-center">
+                        <p class="text-sm "><a href="{% url 'orderhistorypage' %}#{{order.order_id}}" class="hover:text-secondary hover:underline">#{{order.order_id}}</a></p>
+                        <p class="text-sm text-gray-400">{{order.order_date}}</p>
+                    </div>
+                </div>
+                {% endfor %}
+                <p class="text-sm mt-4"><a href="{% url 'orderhistorypage' %}" class="text-primary hover:text-secondary">See more...</a></p>
+                {% endif %}
+            </div>
+            <div class="my-reviews bg-gray-800 p-4 mt-4 rounded">
+                <h1 class="text-2xl flex gap-1 items-center text-primary"><i class="ph-bold ph-chat-centered"></i> My Reviews</h1>
+                {% if user_reviews.count < 1 %}
+                <h1 class="bg-red-400 p-4 text-lg my-4 rounded text-black flex items-center gap-1"><i class="ph-bold ph-warning"></i>No reviews yet!</h1>
+                {% else %}
+                {% for review in user_reviews %}
+                <div class="review mt-4">
+                    <div class="review-header flex justify-between items-center">
+                        <div class="flex items-center  gap-1">
+                            <img src="{{review.game.banner.url}}" class="w-16 h-10 object-cover" loading="lazy">
+                            <div>
+                                <p class="text-base"><a href="#" class="hover:text-secondary hover:underline">{{review.game.display_name|truncatechars:40}}</a></p>
+                                <p class="text-sm text-gray-400">{{review.review|truncatechars:40}}</p>
+                            </div>
+                        </div>
+                        <div class="rating">
+                            {% for val in review.rating|range_in:0 %}
+                            <i class="ph-fill ph-star text-primary"></i>
+                            {% endfor %}
+                            {% for val in review.rating|unfilled_stars %}
+                            <i class="ph-bold ph-star text-primary"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <p class="text-sm mt-4"><a href="#" class="text-secondary hover:text-primary">See more...</a></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="grid-right">
+            <div class="recent-wishlist bg-gray-800 p-4 rounded">
+                <h1 class="text-2xl flex gap-1 items-center text-primary"><i class="ph-bold ph-clipboard-text"></i> My Wishlist</h1>
+                {% if user_wishlist.count < 1 %}
+                <h1 class="bg-red-400 p-4 text-lg my-4 rounded text-black flex items-center gap-1"><i class="ph-bold ph-warning"></i>No games in your wishlist!</h1>
+                {% else %}
+                {% for game in user_wishlist %}
+                <div class="order mt-4">
+                    <div class="order-header flex justify-between items-center">
+                        <div class="flex items-center gap-1">
+                            <img src="{{game.banner.url}}" class="w-16 h-10 object-cover" loading="lazy">
+                            <p class="text-base"><a href="#" class="hover:text-secondary hover:underline">{{game.display_name}}</a></p>
+                        </div>
+                        <div class="pricing flex items-center gap-2 leading-4">
+                            {% if game.discount_amount != 0 %}
+                            <a class="bg-gray-700 p-2">-{{ game.discount_amount |percent_round:game.price }}%</a>
+                            {% endif %}
+                            <div class="flex flex-col text-right">
+                                {% if game.discount_amount != 0 %}
+                                <h2 class="line-through text-[0.8rem]">Rs. {{game.price}}</h2>
+                                {% endif %}
+                                <h2 class="text-primary font-bold">Rs. {{ game.price |subtract:game.discount_amount }}
+                                </h2>
+                            </div>
+                            <a href="#" class="text-2xl text-gray-400 hover:text-primary"><i class="ph-bold ph-basket"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <p class="text-sm mt-4"><a href="{% url 'wishlistpage' %}" class="text-primary hover:text-secondary">See more...</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
