@@ -22,10 +22,12 @@
             </form>
         </div>
         {% for game in wishlisted_games %}
-        <div class="bg-gray-800 mt-2 rounded p-4">
+        <div class="wishlist-item-{{game.slug}} bg-gray-800 mt-2 rounded p-4">
             <div class="flex justify-between">
                 <div class="flex gap-4 items-center">
-                    <i class="r-wl-btn ph-fill ph-heart-straight text-2xl text-primary hover:text-red-400"></i>
+                    <div onclick="removeWishlistItem('{{game.slug}}')">
+                        <i class="r-wl-btn ph-fill ph-heart-straight text-2xl text-primary hover:text-red-400"></i>
+                    </div>
                     <div class="flex items-center gap-2">
                         <img src="{{game.banner.url}}" alt="{{game.display_name}}" loading="lazy" class="rounded w-28 aspect-2 object-cover">
                         <p class="text-gray-300">{{game.display_name}}</p>
@@ -61,7 +63,7 @@
         $('.wishlist-tab').addClass('text-white')
         $('.wishlist-tab-icon').addClass('text-secondary')
     </script>
-
+{% comment %} 
     <script type="text/javascript">
         $('.r-wl-btn').on('mouseover', function() {
             $(this).removeClass('ph-fill').addClass('ph-bold')
@@ -72,5 +74,23 @@
         $('.r-wl-btn').on('click', function() {
             $(this).parent().parent().parent().remove()
         })
-    </script>
+    </script> {% endcomment %}
     {% endblock %}
+
+{% block extrascripts %}
+    <script>
+        function removeWishlistItem(slug) {
+            $.ajax({
+                url: "{% url 'remove_from_wishlist' %}",
+                type: 'POST',
+                data: {
+                    'slug': slug,
+                    'csrfmiddlewaretoken': '{{csrf_token}}'
+                },
+                success: function(res) {
+                    $(`.wishlist-item-${res["slug"]}`).remove()
+                }
+            })
+        }
+    </script>
+{% endblock %}

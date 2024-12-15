@@ -88,8 +88,12 @@
                     </div>
 
                     <div class="ml-auto flex items-center">
+                        {% if user.is_staff %}
+                        <a href="{% url 'dashboard_overview' %}" class="bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
+                            <i class="ph ph-chart-line"></i>
+                        {% endif %}
                         {% if user.is_authenticated %}
-                        <a href="{% url 'profilepage' %}" class="bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
+                        <a href="{% url 'profilepage' %}" class="ml-7 bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
                             <i class="ph ph-user"></i>
                         </a>
                         {% else %}
@@ -100,33 +104,35 @@
                                 <i class="ph-fill ph-heart-straight"></i>
                             </a>
                             <span
-                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{wishlist_count}}</span>
+                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{% if wishlist_count %}{{wishlist_count}}{% else %}0{% endif %}</span>
                         </div>
                         <div class="relative flex items-center justify-center p-3 ml-4">
                             <a href="{% url 'basketpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex items-center gap-2">
                                 <i class="ph-fill ph-basket"></i> <span
-                                    class="hidden lg:block text-sm">Rs.{{basket_value}}</span>
+                                    class="hidden lg:block text-sm">Rs. {% if not basket_value %}0.00{% else %}{{basket_value}}{% endif %}</span>
                             </a>
                             <span
-                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{basket_count}}</span>
+                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{% if basket_count %}{{basket_count}}{% else %}0{% endif %}</span>
                         </div>
                     </div>
                 </div>
+                {% block genre %}
                 <div class="w-full">
                     <ul class="genre-list flex w-full justify-between">
-                        <li class="hover:text-primary">Action</li>
-                        <li class="hover:text-primary">Adventure</li>
-                        <li class="hover:text-primary">Anime</li>
-                        <li class="hover:text-primary">FPS</li>
-                        <li class="hover:text-primary">Horror</li>
-                        <li class="hover:text-primary">Indie</li>
-                        <li class="hover:text-primary">Open World</li>
-                        <li class="hover:text-primary">Racing</li>
-                        <li class="hover:text-primary">RPG</li>
-                        <li class="hover:text-primary">Simulation</li>
-                        <li class="hover:text-primary">Sports</li>
+                        <li class="hover:text-primary"><a href="/genre/action">Action</a></li>
+                        <li class="hover:text-primary"><a href="/genre/adventure">Adventure</a></li>
+                        <li class="hover:text-primary"><a href="/genre/anime">Anime</a></li>
+                        <li class="hover:text-primary"><a href="/genre/fps">FPS</a></li>
+                        <li class="hover:text-primary"><a href="/genre/horror">Horror</a></li>
+                        <li class="hover:text-primary"><a href="/genre/indie">Indie</a></li>
+                        <li class="hover:text-primary"><a href="/genre/open_world">Open World</a></li>
+                        <li class="hover:text-primary"><a href="/genre/racing">Racing</a></li>
+                        <li class="hover:text-primary"><a href="/genre/rpg">RPG</a></li>
+                        <li class="hover:text-primary"><a href="/genre/simulation">Simulation</a></li>
+                        <li class="hover:text-primary"><a href="/genre/sports">Sports</a></li>
                     </ul>
                 </div>
+                {% endblock %}
             </div>
         </nav>
     </header>
@@ -134,7 +140,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    {% endblock %}
 
     <script type="text/javascript">
         if (localStorage.getItem('popupclosed') == 'true') {
@@ -157,15 +164,12 @@
         });
         
         $(document).on('mousedown', function (e) {
-            console.log('mousedown event fired');
             if (!$(e.target).closest('#search-result-box, #search-field').length) {
-                console.log('Click outside detected');
                 $('#search-result-box').addClass('hidden');
             }
         });
         
         $('#search-field').on('focusin', function () {
-            console.log('focusin event fired');
             if ($(this).val().trim().length > 0) {
                 $('#search-result-box').removeClass('hidden');
             }
@@ -173,13 +177,11 @@
         
         $('#search-field').keyup(function () {
             var data = $(this).val();
-            console.log('Search field keyup event fired with value:', data);
             if (data.length > 0) {
                 $.ajax({
                     type: 'GET',
                     url: `/search?q=${data}`,
                     success: function (response) {
-                        console.log('AJAX request successful, response:', response);
                         $('.results').empty();
                         if (response.length < 1) {
                             $('.results').append('<p class="text-gray-400">No results for the given query</p>');

@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.indexpage, name='indexpage'),
     path('game/<str:slug>', views.gamepage, name='gamepage'),
     path('basket', views.basketpage, name='basketpage'),
+    path('genre/<str:genre>', views.genrepage, name='genrepage'),
     path('profile/order_history', account_views.orderhistorypage, name='orderhistorypage'),
     path('profile/wishlist', account_views.wishlistpage, name='wishlistpage'),
     path('profile/my_keys', account_views.mykeyspage, name='mykeyspage'),

@@ -1,4 +1,7 @@
-from .models import Game, GameRating, GameReview, GameCode, GameScreenshot, GameOrder, GameVoucher, GameGenre
+from .models import Game, GameRating, \
+    GameReview, GameCode, GameScreenshot, \
+    GameOrder, GameVoucher, GameGenre, \
+    MinSystemRequirement, RecommendedSystemRequirement
 from django.contrib import admin
 
 # Register your models here.
@@ -29,4 +32,13 @@ class GameOrderAdmin(admin.ModelAdmin):
 @admin.register(GameGenre)
 class GameGenreAdmin(admin.ModelAdmin):
     list_display = ["game"]
+
+@admin.register(MinSystemRequirement)
+class MinSystemRequirementAdmin(admin.ModelAdmin):
+    list_display = ["game"]
+
+@admin.register(RecommendedSystemRequirement)
+class RecommendedSystemRequirementAdmin(admin.ModelAdmin):
+    list_display = ["game"]
+    
 admin.site.register(GameVoucher)

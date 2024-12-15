@@ -152,6 +152,25 @@ class GameGenre(models.Model):
             if getattr(self, field):
                 genres.append(field.replace("_", " ").title())
         return genres
+    
+class RecommendedSystemRequirement(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    os = models.CharField(max_length=250)
+    processor = models.CharField(max_length=500)
+    memory = models.CharField(max_length=250)
+    graphics = models.CharField(max_length=250)
+    storage = models.CharField(max_length=250)
+    additional_note = models.TextField(max_length=1000, blank=True)
+
+class MinSystemRequirement(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    os = models.CharField(max_length=250)
+    processor = models.CharField(max_length=500)
+    memory = models.CharField(max_length=250)
+    graphics = models.CharField(max_length=250)
+    storage = models.CharField(max_length=250)
+    additional_note = models.TextField(max_length=1000, blank=True)
+
 
 @receiver(models.signals.post_save, sender=Game)
 def create_game_related_data(sender, instance, created, **kwargs):

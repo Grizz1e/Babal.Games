@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% block genre %}
+{% endblock %}
+
+{% block content %}
+<section class="container w-full">
+    <div class="mx-auto h-full">
+        <div class="flex w-full h-full justify-center items-center">
+            <div class="h-full gap-4 w-52 bg-gray-800">
+                <ul class="w-full h-full">
+                    <li class="overview-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="{% url 'dashboard_overview' %}"><i class="ph ph-chart-line"></i><span>Overview</span></a></li>
+                    <li class="games-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="{% url 'dashboard_games' %}"><i class="ph ph-game-controller"></i><span>Games</span></a></li>
+                    <li class="users-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-users"></i><span>Users</span></a></li>
+                    <li class="vouchers-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-ticket"></i><span>Vouchers</span></a></li>
+                    <li class="reviews-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-sparkle"></i><span>Reviews</span></a></li>
+                    <li class="keys-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-key"></i></i><span>Keys</span></a></li>
+                </ul>
+            </div>
+            {% block dashboard_content %}<div class='w-full'></div>{%endblock%}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% block tab_highlight %}{% endblock %}
+{% endblock %}

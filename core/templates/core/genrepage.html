@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load custom_tag %}
+
+{% block title %}
+Buy {{genre|title}} Games at Babal.Games
+{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="mx-auto max-w-7xl px-8 py-2">
+        <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
+            <div class="container flex items-center mt-6 mb-4 gap-4">
+                <h2 class="text-2xl ml-10">{{genre|title}} Games</h2>
+            </div>
+
+            <div class="w-full flex-wrap flex gap-8 justify-center">
+                {% for game in games %}
+                <div class="container w-[22rem] overflow-hidden  bg-gray-800 rounded">
+                        <div class="image overflow-hidden relative group">
+                            <img src="/media/{{game.game.banner}}" alt="" loading="lazy"
+                                class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div
+                                class=" h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
+                                <div class="container h-full relative flex flex-col justify-center items-center">
+                                    
+                                    <a href="/game/{{game.game.slug}}"
+                                        class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">
+                                        {{ game.game.display_name }}
+                                    </a>
+                                    <form action="{% url 'add_to_basket' game.game.id %}" method="post" class="w-full flex justify-center">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                            class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm">
+                                            Add to basket
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
+                            <div class="platform flex items-center gap-1 text-xl">
+                                {% if game.game.is_available_on_windows %}
+                                <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
+                                {% endif %}
+                                {% if game.game.is_available_on_mac %}
+                                <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
+                                {% endif %}
+                                {% if game.game.is_available_on_linux %}
+                                <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
+                                {% endif %}
+                            </div>
+                            <div class="pricing flex items-center gap-2 leading-4">
+                                {% if game.game.discount_amount != 0 %}
+                                <a class="bg-gray-700 p-2">-{{ game.game.discount_amount |percent_round:game.game.price }}%</a>
+                                {% endif %}
+                                <div class="flex flex-col text-right">
+                                    {% if game.game.discount_amount != 0 %}
+                                    <h2 class="line-through text-[0.8rem]">Rs. {{game.game.price}}</h2>
+                                    {% endif %}
+                                    <h2 class="text-primary font-bold">Rs. {{ game.game.price |subtract:game.game.discount_amount }}
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

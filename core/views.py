@@ -1,4 +1,6 @@
-from game.models import Game, GameGenre, GameOrder, GameRating, GameReview, GameScreenshot
+from game.models import Game, GameGenre, GameOrder,\
+    GameRating, GameReview, GameScreenshot, \
+    MinSystemRequirement, RecommendedSystemRequirement
 from django.contrib.auth.decorators import login_required
 from account.models import UserProfile, ProfileAvatar
 from .models import Basket, Wishlist, FeaturedGame
@@ -13,6 +15,7 @@ from django.core import serializers
 def indexpage(request):        
     context = {}
     top_sellers = Game.objects.order_by('-copies_sold')[:6]
+    new_games = Game.objects.order_by('-id')[:6]
     featured_games_list = FeaturedGame.objects.all()
     featured_games = []
     for feat_game in featured_games_list:
@@ -28,6 +31,7 @@ def indexpage(request):
             'tag_color_code': feat_game.tag_color_code,
         })
     context["top_sellers"] = top_sellers
+    context["new_games"] = new_games
     context["featured_games"] = featured_games
     context = get_basket_wishlist(request, context)
     # print(get_steam_game_details())
@@ -96,3 +100,14 @@ def profilepage(request):
     user_reviews = GameReview.objects.filter(reviewer=request.user).order_by('-review_date')[:5]
     context["user_reviews"] = user_reviews
     return render(request, 'account/profilepage.html', context)
+
+def genrepage(request, genre:str):
+    try:
+        games = GameGenre.objects.filter(**{genre.lower(): True})
+    except GameGenre.DoesNotExist:
+        return redirect('indexpage')
+    print(games)
+    context = {}
+    context['genre'] = genre.lower()
+    context['games'] = games
+    return render(request, 'core/genrepage.html', context)
