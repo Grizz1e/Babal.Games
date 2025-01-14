@@ -1,5 +1,5 @@
 from django import forms
-from game.models import Game, GameScreenshot, GameGenre
+from game.models import Game, GameScreenshot, GameBuild
 
 class BannerUploadForm(forms.ModelForm):
     class Meta:
@@ -11,7 +11,8 @@ class ScreenshotUploadForm(forms.ModelForm):
         model = GameScreenshot
         fields = "__all__"
 
-class GenreForm(forms.ModelForm):
+class BuildUploadForm(forms.ModelForm):
     class Meta:
-        model = GameGenre
+        model = GameBuild
         fields = "__all__"
+

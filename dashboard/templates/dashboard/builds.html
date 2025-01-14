@@ -1,0 +1,72 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Keys Dashboard | Babal.Games{% endblock %}
+
+{% block dashboard_content %}
+  <section class="container">
+    <div class="filterbox flex justify-between items-center mb-4">
+      <form class="m-0">
+        <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a game" name="q" value="{{ request.GET.q }}" />
+        <button type="submit">Go</button>
+      </form>
+      <a href="{% url 'dashboard_add_build' %}" class="border-2 border-primary text-primary font-bold hover:text-black hover:bg-primary px-2 py-1 rounded">Add new build</a>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+      {% for build in builds %}
+        <div id="build-{{ build.id }}" class="p-2 mb-2 rounded w-full bg-gray-800 flex justify-between items-center gap-2">
+          <a class="text-xl text-gray-400">B{{build.id}}</a>
+            <div class="flex items-center text-gray-300">
+              <a href="{% url 'dashboard_game_page' build.game.id %}" class="hover:text-secondary text-primary">{{ build.game.display_name }}</a>
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="ph ph-trash-simple text-2xl text-red-400 hover:text-red-300 hover:cursor-pointer" onclick="removeBuild('{{ build.id }}')"></i>
+            </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-5 flex items-center">
+      <div class="flex items-center justify-between">
+        <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={% if builds.has_previous %}{{ builds.previous_page_number }}{% else %}1{% endif %}">
+          <i class="ph ph-caret-left"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ builds.number }}">{{ builds.number }}</a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={% if builds.has_next %}{{ builds.next_page_number }}{% else %}{{ builds.paginator.num_pages }}{% endif %}">
+          <i class="ph ph-caret-right"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ builds.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+      </div>
+      <span class="px-2">Go to page</span>
+      <form class="items-center h-fit my-auto flex">
+        <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ builds.number }}" />
+        <input type="hidden" name="q" value="{{ request.GET.q }}" />
+        <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript">
+    
+    function removeBuild(id) {
+      $.ajax({
+        url: "{% url 'remove_build' %}",
+        type: 'POST',
+        data: {
+          id: id,
+          csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function (res) {
+          $(`#build-${id}`).remove()
+        }
+      })
+    }
+
+  </script>
+  {% block tab_highlight %}
+    <script type="text/javascript">
+      $('.builds-tab').addClass('text-secondary')
+      $('.builds-tab').addClass('bg-gray-700')
+    </script>
+  {% endblock %}
+{% endblock %}

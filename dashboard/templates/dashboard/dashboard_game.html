@@ -10,185 +10,273 @@
 </style>
 {% endblock %}
 {% block dashboard_content %}
-<div class="w-full h-full mt-4 p-4">
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl">Edit {{game.display_name}}</h1>
-        <a class="border-primary border-2 rounded px-2 hover:text-black text-primary font-bold hover:bg-primary" href="{% url 'gamepage' game.slug %}">Go to store page</a>
-    </div>
-    <hr class="my-4 border-b-2 border-x-0 border-t-0 border-secondary">
-    <div class="grid grid-cols-2">
-        <div>
-            <form class="" method="post">
-                {% csrf_token %}
-                <label for="display_name">Display Name</label>
-                <div class="flex gap-10 items-center">
-                    <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="display_name" name="display_name" value="{{game.display_name}}">
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form class="" method="post">
-                {% csrf_token %}
-                <label for="slug">Slug</label>
-                <div class="flex gap-10 items-center">
-                    <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="slug" name="slug" value="{{game.slug}}">
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form class="" method="post">
-                {% csrf_token %}
-                <label for="description">Description</label>
-                <div class="flex gap-10 items-center">
-                    <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="slug" name="description">{{game.description}}</textarea>
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form class="" method="post">
-                {% csrf_token %}
-                <label for="long_description">Long Description</label>
-                <div class="flex gap-10 items-center">
-                    <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="slug" name="long_description">{{game.long_description}}</textarea>
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form class="" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="genre">
-                <p>Game Genre</p>
-                <div class="flex gap-10 items-center">
-                    <div class="h-52 w-96 p-2 bg-gray-800 overflow-y-scroll flex-wrap">
-                        <input class="hidden" type="checkbox" id="genre_action" name="genre_action" {% if genre.action %}checked{% endif %}>
-                        <label for="genre_action" class="genre-label inline-flex px-2 m-1 {% if genre.action %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Action</label>
-
-                        <input class="hidden" type="checkbox" id="genre_adventure" name="genre_adventure" {% if genre.adventure %}checked{% endif %}>
-                        <label for="genre_adventure" class="genre-label inline-flex px-2 m-1 {% if genre.adventure %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Adventure</label>
-
-                        <input class="hidden" type="checkbox" id="genre_anime" name="genre_anime" {% if genre.anime %}checked{% endif %}>
-                        <label for="genre_anime" class="genre-label inline-flex px-2 m-1 {% if genre.anime %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Anime</label>
-
-                        <input class="hidden" type="checkbox" id="genre_fps" name="genre_fps" {% if genre.fps %}checked{% endif %}>
-                        <label for="genre_fps" class="genre-label inline-flex px-2 m-1 {% if genre.fps %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">FPS</label>
-
-                        <input class="hidden" type="checkbox" id="genre_horror" name="genre_horror" {% if genre.horror %}checked{% endif %}>
-                        <label for="genre_horror" class="genre-label inline-flex px-2 m-1 {% if genre.horror %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Horror</label>
-
-                        <input class="hidden" type="checkbox" id="genre_indie" name="genre_indie" {% if genre.indie %}checked{% endif %}>
-                        <label for="genre_indie" class="genre-label inline-flex px-2 m-1 {% if genre.indie %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Indie</label>
-
-                        <input class="hidden" type="checkbox" id="genre_open_world" name="genre_open_world" {% if genre.open_world %}checked{% endif %}>
-                        <label for="genre_open_world" class="genre-label inline-flex px-2 m-1 {% if genre.open_world %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Open World</label>
-
-                        <input class="hidden" type="checkbox" id="genre_racing" name="genre_racing" {% if genre.racing %}checked{% endif %}>
-                        <label for="genre_racing" class="genre-label inline-flex px-2 m-1 {% if genre.racing %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Racing</label>
-
-                        <input class="hidden" type="checkbox" id="genre_rpg" name="genre_rpg" {% if genre.rpg %}checked{% endif %}>
-                        <label for="genre_rpg" class="genre-label inline-flex px-2 m-1 {% if genre.rpg %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">RPG</label>
-
-                        <input class="hidden" type="checkbox" id="genre_simulation" name="genre_simulation" {% if genre.simulation %}checked{% endif %}>
-                        <label for="genre_simulation" class="genre-label inline-flex px-2 m-1 {% if genre.simulation %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Simulation</label>
-
-                        <input class="hidden" type="checkbox" id="genre_sports" name="genre_sports" {% if genre.sports %}checked{% endif %}>
-                        <label for="genre_sports" class="genre-label inline-flex px-2 m-1 {% if genre.sports %}border-primary text-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Sports</label>
-                    </div>
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form method="post">
-                {% csrf_token %}
-                <p>Available Platforms</p>
-                <input type="hidden" name="form_type", value="platform">
-                <div class="flex gap-10 items-center">
-                    <div class="flex w-96 justify-start bg-gray-800 p-4 rounded">
-                        <input class="hidden" type="checkbox" id="platform_windows", name="platform_windows" {% if game.is_available_on_windows %}checked{% endif %}>
-                        <label for="platform_windows" class="platform-label text-5xl"><i class="{% if game.is_available_on_windows %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-windows-logo"></i></label>
-
-                        <input class="hidden" type="checkbox" id="platform_linux", name="platform_linux" {% if game.is_available_on_linux %}checked{% endif %}>
-                        <label for="platform_linux" class="platform-label text-5xl"><i class="{% if game.is_available_on_linux %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-linux-logo"></i></label>
-
-                        <input class="hidden" type="checkbox" id="platform_mac", name="platform_mac" {% if game.is_available_on_mac %}checked{% endif %}>
-                        <label for="platform_mac" class="platform-label text-5xl"><i class="{% if game.is_available_on_mac %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-apple-logo"></i></label>
-                    </div>
-                    <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
-                </div>
-            </form>
-            <form method="post">
-                {% csrf_token %}
-                
-            </form>
+    <div class="px-10 flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2">
+                <a href="{% if request.GET.referer %}{% url request.GET.referer %}{% else %}{% url 'dashboard_games' %}{% endif %}?page={{request.GET.page}}&q={{request.GET.q}}">
+                    <i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i>
+                </a>
+                <h1 class="text-3xl">Edit {{ game.display_name }}</h1>
         </div>
-        <div>
-            <form class="h-fit" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <label for="banner">Banner Image</label>
-                <div class="w-96 h-52 relative group">
-                    <img id="banner_preview" src="/media/{{game.banner}}" class="rounded z-0 w-full h-full object-cover object-center group-hover:brightness-50">
-                    <label for="banner" class="text-center">
-                        <i class="hidden group-hover:block text-7xl ph ph-file-plus absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
-                    </label>
-                </div>
-                <input class="hidden" id="banner" name="banner" type="file" accept="image/*">
-                <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-2 flex items-center gap-2">
-                    <i class="ph ph-checks text-2xl"></i>
-                    <span>Update</span>
-                </button>
-            </form>
-            <form class="h-fit" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <label for="screenshot">Screenshots</label>
-                <div class="grid grid-cols-3">
-                    {% for screenshot in screenshots %}
-                    <a href="/media/{{screenshot.image}}" class="my-2"><img src="/media/{{screenshot.image}}" class="rounded w-40 h-20 object-cover"></a>
-                    {% endfor %}
-                    <a href="#" class="my-2 hidden"><img src="" id="screenshot_preview" class="brightness-50 rounded w-40 h-20 object-cover"></a>
-                    <label for="screenshot" class="my-2 hover:bg-gray-700 cursor-pointer rounded w-40 h-20 flex justify-center items-center text-center bg-gray-800">
-                        <i class="text-5xl ph ph-file-plus"></i>
-                    </label>
-                </div>
-                <input class="hidden" id="screenshot" name="screenshot" type="file" accept="image/*">
-                <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-2 flex items-center gap-2">
-                    <i class="ph ph-checks text-2xl"></i>
-                    <span>Update</span>
-                </button>
-            </form>
-            <form method="post">
-                {% csrf_token %}
-                <label for="price">Price</label>
-                <div class="flex gap-10 items-center">
-                    <input type="number" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="price" name="price" value="{{game.price}}">
-                    <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
-                </div>
-            </form>
-            <form method="post">
-                {% csrf_token %}
-                <label for="discount_amount">Discount Amount</label>
-                <div class="flex gap-10 items-center">
-                    <input type="number" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="discount_amount" name="discount_amount" value="{{game.discount_amount}}">
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
-                </div>
-            </form>
-            <div class="flex gap-5 items-center">
-                <label class="w-fit" for="final_price">Final Price</label>
-                <input type="text" step="0.01" class="w-28 rounded indent-2 py-2 bg-gray-800" disabled id="final_price" value="Rs. {{game.price|subtract:game.discount_amount}}">
+        <a href="{% url 'gamepage' game.slug %}" class="hover:bg-primary text-primary hover:text-black border-2 border-primary px-2 rounded">Store Page</a>
+    </div>
+    <div class="grid grid-cols-2 gap-10 px-10">
+        <div class="">
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="display_name" class="text-2xl w-full">Display Name</label>
+                    <div class="flex gap-10 items-center">
+                        <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="display_name" name="display_name" value="{{game.display_name}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="slug" class="text-2xl w-full">Slug</label>
+                    <div class="flex gap-10 items-center">
+                        <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="slug" name="slug" value="{{game.slug}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
             </div>
-            <form class="" method="post">
-                {% csrf_token %}
-                <label for="steam_id">Steam App ID</label>
-                <div class="flex gap-10 items-center">
-                    <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="steam_id" name="steam_id" value="{{game.steam_id}}">
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="description" class="text-2xl w-full">Description</label>
+                    <div class="flex gap-10 items-center">
+                        <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="description" name="description">{{game.description}}</textarea>
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="long_description" class="text-2xl w-full">Long Description</label>
+                    <div class="flex gap-10 items-center">
+                        <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="long_description" name="long_description">{{game.long_description}}</textarea>
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="genre">
+                    <p class="text-2xl w-full">Game Genre</p>
+                    <div class="flex gap-10 items-center">
+                        <div class="h-52 w-96 p-2 bg-gray-800 overflow-y-scroll flex-wrap rounded">
+                            {% for g in genres.all %}
+                            <input class="hidden" type="checkbox" id="genre_{{g.slug}}" name="genre_{{g.slug}}" {% if g in genres.associated %}checked{% endif %}>
+                            <label for="genre_{{g.slug}}" class="genre-label inline-flex px-2 m-1 {% if g in genres.associated %}border-primary text-black bg-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">{{g.display_name}}</label>
+                            {% endfor %}
+                        </div>
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form method="post">
+                    {% csrf_token %}
+                    <p class="text-2xl w-full">Available Platforms</p>
+                    <input type="hidden" name="form_type" value="platform">
+                    <div class="flex gap-10 items-center">
+                        <div class="flex w-96 justify-start bg-gray-800 p-4 rounded">
+                            <input class="hidden" type="checkbox" id="platform_windows" name="platform_windows" {% if game.is_available_on_windows %}checked{% endif %}>
+                            <label for="platform_windows" class="platform-label text-5xl"><i class="{% if game.is_available_on_windows %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-windows-logo"></i></label>
+
+                            <input class="hidden" type="checkbox" id="platform_linux" name="platform_linux" {% if game.is_available_on_linux %}checked{% endif %}>
+                            <label for="platform_linux" class="platform-label text-5xl"><i class="{% if game.is_available_on_linux %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-linux-logo"></i></label>
+
+                            <input class="hidden" type="checkbox" id="platform_mac" name="platform_mac" {% if game.is_available_on_mac %}checked{% endif %}>
+                            <label for="platform_mac" class="platform-label text-5xl"><i class="{% if game.is_available_on_mac %}text-primary ph-fill{% else %}ph text-gray-400{% endif %} ph-apple-logo"></i></label>
+                        </div>
+                        <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="min-requirement">
+                    <p class="text-2xl w-full">Minimum System Requirements</p>
+                    <div class="mt-2 flex gap-10 items-center">
+                        <div class="w-96">
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="min_os" class="col-span-2">OS:</label>
+                                <input name="min_os" id="min_os" type="text" value="{{system_requirements.min.os}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="min_processor" class="col-span-2">Processor:</label>
+                                <input name="min_processor" id="min_processor" type="text" value="{{system_requirements.min.processor}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="min_memory" class="col-span-2">Memory:</label>
+                                <input name="min_memory" id="min_memory" type="text" value="{{system_requirements.min.memory}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="min_graphics" class="col-span-2">Graphics:</label>
+                                <input name="min_graphics" id="min_graphics" type="text" value="{{system_requirements.min.graphics}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="min_storage" class="col-span-2">Storage:</label>
+                                <input name="min_storage" id="min_storage" type="text" value="{{system_requirements.min.storage}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                        </div>
+                        <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="rec-requirement">
+                    <p class="text-2xl w-full">Recommended System Requirements</p>
+                    <div class="mt-2 flex gap-10 items-center">
+                        <div class="w-96">
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="rec_os" class="col-span-2">OS:</label>
+                                <input name="rec_os" id="rec_os" type="text" value="{{system_requirements.recommended.os}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="rec_processor" class="col-span-2">Processor:</label>
+                                <input name="rec_processor" id="rec_processor" type="text" value="{{system_requirements.recommended.processor}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="rec_memory" class="col-span-2">Memory:</label>
+                                <input name="rec_memory" id="rec_memory" type="text" value="{{system_requirements.recommended.memory}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="rec_graphics" class="col-span-2">Graphics:</label>
+                                <input name="rec_graphics" id="rec_graphics" type="text" value="{{system_requirements.recommended.graphics}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                            <div class="w-full grid grid-cols-8 items-center my-2">
+                                <label for="rec_storage" class="col-span-2">Storage:</label>
+                                <input name="rec_storage" id="rec_storage" type="text" value="{{system_requirements.recommended.storage}}" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                            </div>
+                        </div>
+                        <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="h-fit" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="banner" class="text-2xl w-full">Banner Image</label>
+                    <div class="w-96 h-52 relative group">
+                        <img id="banner_preview" src="/media/{{game.banner}}" class="rounded z-0 w-full h-full object-cover object-center group-hover:brightness-50">
+                        <label for="banner" class="text-center">
+                            <i class="hidden group-hover:block text-7xl ph ph-file-plus absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                        </label>
+                    </div>
+                    <input class="hidden" id="banner" name="banner" type="file" accept="image/*">
+                    <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-2 flex items-center gap-2">
+                        <i class="ph ph-checks text-2xl"></i>
+                        <span>Update</span>
+                    </button>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="h-fit" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="screenshot" class="text-2xl w-full">Screenshots</label>
+                    <div class="grid grid-cols-3">
+                        {% for screenshot in screenshots %}
+                        <a href="/media/{{screenshot.image}}" class="my-2"><img src="/media/{{screenshot.image}}" class="rounded w-40 h-20 object-cover"></a>
+                        {% endfor %}
+                        <a href="#" class="my-2 hidden"><img src="" id="screenshot_preview" class="brightness-50 rounded w-40 h-20 object-cover"></a>
+                        <label for="screenshot" class="my-2 hover:bg-gray-700 cursor-pointer rounded w-40 h-20 flex justify-center items-center text-center bg-gray-800">
+                            <i class="text-5xl ph ph-file-plus"></i>
+                        </label>
+                    </div>
+                    <input class="hidden" id="screenshot" name="screenshot" type="file" accept="image/*">
+                    <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 mt-2 flex items-center gap-2">
+                        <i class="ph ph-checks text-2xl"></i>
+                        <span>Update</span>
+                    </button>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="price" class="text-2xl w-full">Price</label>
+                    <div class="flex gap-10 items-center">
+                        <input type="number" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="price" name="price" value="{{game.price}}">
+                        <button type="submit" class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
+                    </div>
+                </form>
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="discount_amount" class="text-2xl w-full">Discount Amount</label>
+                    <div class="flex gap-10 items-center">
+                        <input type="number" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="discount_amount" name="discount_amount" value="{{game.discount_amount}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
+                    </div>
+                </form>
+                <div class="flex gap-5 items-center mb-2">
+                    <label class="w-fit" for="final_price">Final Price</label>
+                    <input type="text" step="0.01" class="w-28 rounded indent-2 py-2 bg-gray-800" disabled id="final_price" value="Rs. {{game.price|subtract:game.discount_amount}}">
                 </div>
-            </form>
-            <form method="post" class="mt-2">
-                {% csrf_token %}
-                <label for="yt_trailer_id">YouTube Trailer ID</label>
-                <div class="flex items-center mb-2 gap-10">
-                    <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="yt_trailer_id" name="yt_trailer_id" value="{{game.yt_trailer_id}}">
-                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
-                </div>
-                <iframe class="rounded" id="yt-trailer-frame" width="560" height="315" src="https://www.youtube.com/embed/{{game.yt_trailer_id}}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-            </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="steam_id" class="text-2xl w-full">Steam App ID</label>
+                    <div class="flex gap-10 items-center">
+                        <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="steam_id" name="steam_id" value="{{game.steam_id}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+                <form method="post" class="mt-2">
+                    {% csrf_token %}
+                    <label for="yt_trailer_id" class="text-2xl w-full">YouTube Trailer ID</label>
+                    <div class="flex items-center mb-2 gap-10">
+                        <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="yt_trailer_id" name="yt_trailer_id" value="{{game.yt_trailer_id}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span></button>
+                    </div>
+                    <iframe class="rounded outline-none" id="yt-trailer-frame" src="https://www.youtube.com/embed/{{game.yt_trailer_id}}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="additional_note" class="text-2xl w-full">Additional Note</label>
+                    <div class="flex gap-10 items-center">
+                        <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="additional_note" name="additional_note">{{system_requirements.min.additional_note}}</textarea>
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="game_developer" class="text-2xl w-full">Developer</label>
+                    <div class="flex gap-10 items-center">
+                        <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_developer" name="game_developer" value="{{game.developer}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="game_publisher" class="text-2xl w-full">Publisher</label>
+                    <div class="flex gap-10 items-center">
+                        <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_publisher" name="game_publisher" value="{{game.publisher}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+                <form class="" method="post">
+                    {% csrf_token %}
+                    <label for="game_support" class="text-2xl w-full">Support URL</label>
+                    <div class="flex gap-10 items-center">
+                        <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_support" name="game_support" value="{{game.support_url}}">
+                        <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
@@ -235,7 +323,7 @@
 </script>
 <script>
     $('.genre-label').click(function () {
-        $(this).toggleClass('border-gray-400 text-gray-400 border-primary text-primary')
+        $(this).toggleClass('border-gray-400 text-gray-400 border-primary text-black bg-primary')
     })
 
     $('.platform-label').click(function () {

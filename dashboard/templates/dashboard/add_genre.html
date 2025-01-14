@@ -1,0 +1,32 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Add New Genre | Babal.Store{% endblock %}
+{% block dashboard_content %}
+<div class="px-10 flex items-center justify-between mb-10">
+    <div class="flex items-center gap-2">
+      <a href="{% url 'dashboard_genres' %}"><i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i></a>
+      <h1 class="text-3xl">Add New Genre</h1>
+    </div>
+  </div>
+  <form method="post" class="m-0 p-0">
+    {% csrf_token %}
+    <div class="w-fit border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+        <label for="display_name" class="text-2xl w-full">Display Name</label>
+        <div class="flex gap-10 items-center">
+            <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="display_name" name="display_name" placeholder="Publicly visible name of the genre">
+        </div>
+
+        <label for="slug" class="text-2xl w-full">Slug</label>
+        <div class="flex gap-10 items-center">
+            <input required type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="slug" name="slug" placeholder="Unique genre slug">
+        </div>
+    </div>
+    <button type="submit" class="my-5 rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Add</span></button>
+  </form>
+{% endblock %}
+
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.genres-tab').addClass('text-secondary')
+    $('.genres-tab').addClass('bg-gray-700')
+  </script>
+{% endblock %}

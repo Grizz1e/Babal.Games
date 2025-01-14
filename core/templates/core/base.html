@@ -1,4 +1,6 @@
+{% load i18n %}
 {% load static %}
+{% language 'en' %}
 <!DOCTYPE html class="dark">
 <html lang="en" class="scroll-smooth">
 
@@ -72,7 +74,7 @@
 
                     </div>
                     <div class="hidden lg:block">
-                        <form action="{% url 'resultpage' %}" class="mb-0 ml-10 relative">
+                        <div class="mb-0 ml-10 relative">
                             <input type="text" name="q" id="search-field"
                                 class="h-10 rounded w-[500px] outline-none text-black indent-5 uppercase placeholder:normal-case"
                                 placeholder="Search your favourite games" autocomplete="off">
@@ -84,7 +86,7 @@
                                     <p class="text-gray-400">No results for the given query</p>
                                 </ul>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <div class="ml-auto flex items-center">
@@ -103,39 +105,42 @@
                             <a href="{% url 'wishlistpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded">
                                 <i class="ph-fill ph-heart-straight"></i>
                             </a>
-                            <span
-                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{% if wishlist_count %}{{wishlist_count}}{% else %}0{% endif %}</span>
+                            <span id="wishlist-count"
+                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1"></span>
                         </div>
                         <div class="relative flex items-center justify-center p-3 ml-4">
                             <a href="{% url 'basketpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex items-center gap-2">
                                 <i class="ph-fill ph-basket"></i> <span
-                                    class="hidden lg:block text-sm">Rs. {% if not basket_value %}0.00{% else %}{{basket_value}}{% endif %}</span>
+                                    class="hidden lg:block text-sm" id="basket-value">Rs. {% if not basket_value %}0.00{% else %}{{basket_value}}{% endif %}</span>
                             </a>
-                            <span
+                            <span id="basket-count"
                                 class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{% if basket_count %}{{basket_count}}{% else %}0{% endif %}</span>
                         </div>
                     </div>
                 </div>
                 {% block genre %}
-                <div class="w-full">
-                    <ul class="genre-list flex w-full justify-between">
-                        <li class="hover:text-primary"><a href="/genre/action">Action</a></li>
-                        <li class="hover:text-primary"><a href="/genre/adventure">Adventure</a></li>
-                        <li class="hover:text-primary"><a href="/genre/anime">Anime</a></li>
-                        <li class="hover:text-primary"><a href="/genre/fps">FPS</a></li>
-                        <li class="hover:text-primary"><a href="/genre/horror">Horror</a></li>
-                        <li class="hover:text-primary"><a href="/genre/indie">Indie</a></li>
-                        <li class="hover:text-primary"><a href="/genre/open_world">Open World</a></li>
-                        <li class="hover:text-primary"><a href="/genre/racing">Racing</a></li>
-                        <li class="hover:text-primary"><a href="/genre/rpg">RPG</a></li>
-                        <li class="hover:text-primary"><a href="/genre/simulation">Simulation</a></li>
-                        <li class="hover:text-primary"><a href="/genre/sports">Sports</a></li>
-                    </ul>
+                <div class="w-full flex flex-col">
+                    <div class="w-full">
+                        <ul id="genre-list" class="genre-list flex w-full justify-between items-center">
+                            <button id="show-all" class="px-2 py-1 border-2 border-primary rounded text-primary cursor-pointer">Show All</button>
+                        </ul>
+                    </div>
+                    <div id="all-genre-list" class="w-full bg-gray-900 my-4 rounded hidden">
+                        <ul class="genre-list grid grid-cols-4 text-center w-full py-4">
+                        </ul>
+                    </div>
                 </div>
                 {% endblock %}
             </div>
         </nav>
     </header>
+    {% for message in messages %}
+    
+    <div class="w-full bg-red-400 flex items-center justify-center gap-5 text-black text-2xl py-1 px-2">
+        <i class="ph-bold ph-warning"></i><span>{{message}}</span>
+    </div>
+
+{% endfor %}
     {% block content %}{% endblock %}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -174,6 +179,10 @@
                 $('#search-result-box').removeClass('hidden');
             }
         });
+
+        $('#show-all').on('click', function () {
+            $('#all-genre-list').toggle()
+        })
         
         $('#search-field').keyup(function () {
             var data = $(this).val();
@@ -211,8 +220,37 @@
                 $('#search-result-box').addClass('hidden');
             }
         });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/backend/get_base_info',
+                method: 'GET',
+                success: function (data) {
+                    ten_genres = data.genres.slice(-9)
+                    ten_genres.forEach(function (genre) {
+                        $('#genre-list').prepend(`<li class="hover:text-primary">
+                        <a href="/genre/${genre.slug}">${genre.display_name}
+                        </li>`);
+                    });
+                    data.genres.forEach(function (genre) {
+                        $('#all-genre-list ul').prepend(`<li class="hover:text-primary">
+                        <a href="/genre/${genre.slug}">${genre.display_name}
+                        </li>`);
+                    });
+                    $('#wishlist-count').text(data.wishlist.count.toLocaleString())
+                    $('#basket-count').text(data.basket.count.toLocaleString())
+                    $('#basket-value').text(`Rs. ${data.basket.value.toLocaleString()}`)
+                },
+                error: function (error) {
+                    console.error('Error fetching genres:', error);
+                }
+            });
+        });
     </script>
     
 </body>
 
 </html>
+{% endlanguage %}

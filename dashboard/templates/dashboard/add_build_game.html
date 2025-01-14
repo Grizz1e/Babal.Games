@@ -1,0 +1,45 @@
+{% extends 'dashboard/base.html' %}
+{% block dashboard_content %}
+  <div class="px-10 flex items-center justify-between mb-10">
+    <div class="flex items-center gap-2">
+      <a href="{% url 'dashboard_builds' %}"><i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i></a>
+      <h1 class="text-3xl">Upload The Build File</h1>
+    </div>
+  </div>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="bg-gray-800 flex w-96 h-52 items-center justify-center">
+      <label for="build-field" class="w-full h-full flex items-center justify-center text-gray-400 hover:text-gray-300 cursor-pointer"><i class="ph ph-file-archive text-6xl"></i></label>
+    </div>
+    <input id="build-field" name="build-field" type="file" accept="application/zip" class="hidden" />
+    <p id="file-name"></p>
+    <button type="submit" class="my-5 rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Publish</span></button>
+  </form>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      // Add a change event listener to the file input
+      $('#build-field').on('change', function () {
+        // Check if a file is selected
+        if (this.files.length > 0) {
+          // Get the file name
+          const file = this.files[0]
+          const fileName = file.name
+          const fileSize = file.size
+          // Display the file name in the paragraph
+          $('#file-name').text(`${fileName} | ${(fileSize / 1024 / 1024).toFixed(2).toLocaleString()} MB`)
+        } else {
+          $('#file-name').text('No file chosen')
+        }
+      })
+    })
+  </script>
+  {% block tab_highlight %}
+    <script type="text/javascript">
+      $('.builds-tab').addClass('text-secondary')
+      $('.builds-tab').addClass('bg-gray-700')
+    </script>
+  {% endblock %}
+{% endblock %}

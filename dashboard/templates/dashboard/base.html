@@ -1,27 +1,47 @@
 {% extends 'core/base.html' %}
 {% block genre %}
+
 {% endblock %}
 
 {% block content %}
-<section class="container w-full">
-    <div class="mx-auto h-full">
-        <div class="flex w-full h-full justify-center items-center">
-            <div class="h-full gap-4 w-52 bg-gray-800">
-                <ul class="w-full h-full">
-                    <li class="overview-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="{% url 'dashboard_overview' %}"><i class="ph ph-chart-line"></i><span>Overview</span></a></li>
-                    <li class="games-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="{% url 'dashboard_games' %}"><i class="ph ph-game-controller"></i><span>Games</span></a></li>
-                    <li class="users-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-users"></i><span>Users</span></a></li>
-                    <li class="vouchers-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-ticket"></i><span>Vouchers</span></a></li>
-                    <li class="reviews-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-sparkle"></i><span>Reviews</span></a></li>
-                    <li class="keys-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2"><a class="grid grid-flow-col items-center" href="#"><i class="ph ph-key"></i></i><span>Keys</span></a></li>
-                </ul>
-            </div>
-            {% block dashboard_content %}<div class='w-full'></div>{%endblock%}
-        </div>
+  <div class="grid grid-cols-12 h-full justify-between items-center">
+    <ul class="h-full w-full col-span-2 bg-gray-800">
+      <li class="overview-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_overview' %}"><i class="ph ph-chart-line"></i><span>Overview</span></a>
+      </li>
+      <li class="games-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_games' %}"><i class="ph ph-game-controller"></i><span>Games</span></a>
+      </li>
+      <li class="users-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_users' %}"><i class="ph ph-users"></i><span>Users</span></a>
+      </li>
+      <li class="vouchers-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_vouchers' %}"><i class="ph ph-ticket"></i><span>Vouchers</span></a>
+      </li>
+      <li class="builds-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_builds' %}"><i class="ph ph-file-archive"></i><span>Builds</span></a>
+      </li>
+      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-mask-happy"></i><span>Genres</span></a>
+      </li>
+      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-star"></i><span>Ratings</span></a>
+      </li>
+      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-chat-text"></i><span>Reviews</span></a>
+      </li>
+      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-sign-out"></i><span>Log Out</span></a>
+      </li>
+    </ul>
+    <div class="h-full p-4 col-span-10">
+      {% block dashboard_content %}
+      {% endblock %}
     </div>
-</section>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-{% block tab_highlight %}{% endblock %}
+  {% block tab_highlight %}
+  {% endblock %}
 {% endblock %}

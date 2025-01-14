@@ -1,0 +1,285 @@
+{% extends 'dashboard/base.html' %}
+{% load custom_tag %}
+{% block title %}Game Dashboard{% endblock %}
+{% block links %}
+<style>
+    label {
+        width: 10rem;
+        display: block;
+    };
+</style>
+{% endblock %}
+{% block dashboard_content %}
+    <div class="px-10 flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2">
+            <a href="{% if request.GET.referer %}{% url request.GET.referer %}{% else %}{% url 'dashboard_games' %}{% endif %}?page={{request.GET.page}}&q={{request.GET.q}}">
+                <i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i>
+            </a>
+            <h1 class="text-3xl">Add a New Game</h1>
+        </div>
+    </div>
+    <form class="m-0 p-0" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-10 px-10">
+            <div class="">
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="display_name" class="text-2xl w-full">Display Name</label>
+                        <div class="flex gap-10 items-center">
+                            <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="display_name" name="display_name" placeholder="Publicly visible name of the game">
+                        </div>
+
+                        <label for="slug" class="text-2xl w-full">Slug</label>
+                        <div class="flex gap-10 items-center">
+                            <input required type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="slug" name="slug" placeholder="Unique game slug">
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="description" class="text-2xl w-full">Description</label>
+                        <div class="flex gap-10 items-center">
+                            <textarea required class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="description" name="description" placeholder="Short description about the game"></textarea>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="long_description" class="text-2xl w-full">Long Description</label>
+                        <div class="flex gap-10 items-center">
+                            <textarea required class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="long_description" name="long_description" placeholder="Long and detailed information about the game"></textarea>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <input type="hidden" name="form_type" value="genre">
+                        <p class="text-2xl w-full">Game Genre</p>
+                        <div class="flex gap-10 items-center">
+                            <div class="h-52 w-96 p-2 bg-gray-800 overflow-y-scroll flex-wrap rounded">
+                                {% for g in genres.all %}
+                                <input class="hidden" type="checkbox" id="genre_{{g.slug}}" name="genre_{{g.slug}}">
+                                <label for="genre_{{g.slug}}" class="genre-label inline-flex px-2 m-1 border-gray-400 text-gray-400 border-2 h-fit w-fit rounded-lg">{{g.display_name}}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        {% csrf_token %}
+                        <p class="text-2xl w-full">Available Platforms</p>
+                        <input type="hidden" name="form_type" value="platform">
+                        <div class="flex gap-10 items-center">
+                            <div class="flex w-96 justify-start bg-gray-800 p-4 rounded">
+                                <input class="hidden" type="checkbox" id="platform_windows" name="platform_windows">
+                                <label for="platform_windows" class="platform-label text-5xl"><i class="ph text-gray-400 ph-windows-logo"></i></label>
+
+                                <input class="hidden" type="checkbox" id="platform_linux" name="platform_linux">
+                                <label for="platform_linux" class="platform-label text-5xl"><i class="ph text-gray-400 ph-linux-logo"></i></label>
+
+                                <input class="hidden" type="checkbox" id="platform_mac" name="platform_mac">
+                                <label for="platform_mac" class="platform-label text-5xl"><i class="ph text-gray-400 ph-apple-logo"></i></label>
+                            </div>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <input type="hidden" name="form_type" value="min-requirement">
+                        <p class="text-2xl w-full">Minimum System Requirements</p>
+                        <div class="mt-2 flex gap-10 items-center">
+                            <div class="w-96">
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="min_os" class="col-span-2">OS:</label>
+                                    <input required name="min_os" id="min_os" type="text" placeholder="Minimum OS requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="min_processor" class="col-span-2">Processor:</label>
+                                    <input required name="min_processor" id="min_processor" type="text" placeholder="Minimum processor requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="min_memory" class="col-span-2">Memory:</label>
+                                    <input required name="min_memory" id="min_memory" type="text" placeholder="Minimum memory requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="min_graphics" class="col-span-2">Graphics:</label>
+                                    <input required name="min_graphics" id="min_graphics" type="text" placeholder="Minimum graphics requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="min_storage" class="col-span-2">Storage:</label>
+                                    <input required name="min_storage" id="min_storage" type="text" placeholder="Minimum storage requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+
+                        <input type="hidden" name="form_type" value="rec-requirement">
+                        <p class="text-2xl w-full">Recommended System Requirements</p>
+                        <div class="mt-2 flex gap-10 items-center">
+                            <div class="w-96">
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="rec_os" class="col-span-2">OS:</label>
+                                    <input required name="rec_os" id="rec_os" type="text" placeholder="Recommended OS requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="rec_processor" class="col-span-2">Processor:</label>
+                                    <input required name="rec_processor" id="rec_processor" type="text" placeholder="Recommended processor requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="rec_memory" class="col-span-2">Memory:</label>
+                                    <input required name="rec_memory" id="rec_memory" type="text" placeholder="Recommended memory requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="rec_graphics" class="col-span-2">Graphics:</label>
+                                    <input required name="rec_graphics" id="rec_graphics" type="text" placeholder="Recommended graphics requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                                <div class="w-full grid grid-cols-8 items-center my-2">
+                                    <label for="rec_storage" class="col-span-2">Storage:</label>
+                                    <input required name="rec_storage" id="rec_storage" type="text" placeholder="Recommended storage requirement" class="col-span-6 bg-gray-800 outline-none border-none h-9 indent-4 w-full rounded">
+                                </div>
+                            </div>
+                       </div>
+                </div>
+            </div>
+            <div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="banner" class="text-2xl w-full">Banner Image</label>
+                        <div class="w-96 h-52 relative group bg-gray-600 rounded">
+                            <img id="banner_preview" src="" class="rounded z-0 w-full h-full object-cover object-center brightness-50">
+                            <label for="banner" class="text-center">
+                                <i class="text-gray-400 hover:text-white group-hover:block text-7xl ph ph-file-plus absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                            </label>
+                        </div>
+                        <input required class="hidden" id="banner" name="banner" type="file" accept="image/*">
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                    <label for="game-file" class="text-2xl w-full">Game File</label>
+                    <div class="w-96 h-52 relative group bg-gray-600 rounded">
+                        <label for="game-file" class="text-center">
+                            <i class="text-gray-400 hover:text-white group-hover:block text-7xl ph ph-file-archive absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                        </label>
+                    </div>
+                    <p id="file-name"></p>
+                    <input required class="hidden" id="game-file" name="game-file" type="file" accept="application/zip">
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="price" class="text-2xl w-full">Price</label>
+                        <div class="flex gap-10 items-center">
+                            <input required type="number" step="0.01" value="0.00" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="price" name="price" placeholder="Original Price in Rs.">
+                        </div>
+                        <label for="discount_amount" class="text-2xl w-full">Discount Amount</label>
+                        <div class="flex gap-10 items-center">
+                            <input required type="number" value="0.00" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="discount_amount" name="discount_amount" placeholder="Discount Amount in Rs.">
+                        </div>
+                    <div class="flex gap-5 items-center my-2">
+                        <label class="w-fit" for="final_price">Final Price</label>
+                        <input type="text" step="0.01" class="w-28 rounded indent-2 py-2 bg-gray-800" disabled id="final_price" value="Rs. 0.00">
+                    </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="steam_id" class="text-2xl w-full">Steam App ID</label>
+                        <div class="flex gap-10 items-center">
+                            <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="steam_id" name="steam_id" placeholder="App ID (If Exists)">
+                        </div>
+                        <label for="yt_trailer_id" class="text-2xl w-full">YouTube Trailer ID</label>
+                        <div class="flex items-center mb-2 gap-10">
+                            <input required type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="yt_trailer_id" name="yt_trailer_id" placeholder="YouTube Trailer ID (NOT URL)">
+                        </div>
+                        <iframe class="rounded outline-none" id="yt-trailer-frame" src="https://www.youtube.com/embed/" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="additional_note" class="text-2xl w-full">Additional Note</label>
+                        <div class="flex gap-10 items-center">
+                            <textarea class="bg-gray-800 outline-none border-none h-52 p-2 w-96" id="additional_note" name="additional_note" placeholder="Additional important note to consider"></textarea>
+                        </div>
+                </div>
+                <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                        <label for="game_developer" class="text-2xl w-full">Developer</label>
+                        <div class="flex gap-10 items-center">
+                            <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_developer" name="game_developer" placeholder="Game Developer">
+                        </div>
+                        <label for="game_publisher" class="text-2xl w-full">Publisher</label>
+                        <div class="flex gap-10 items-center">
+                            <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_publisher" name="game_publisher" placeholder="Game Publisher">
+                        </div>
+                        <label for="game_support" class="text-2xl w-full">Support URL</label>
+                        <div class="flex gap-10 items-center">
+                            <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="game_support" name="game_support" placeholder="Support URL">
+                        </div>
+                </div>
+                <div class="w-full p-2 mt-2 mb-5 rounded-xl flex justify-end">
+                    <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Upload</span><button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function update_price() {
+        price = parseInt($('#price').val())
+        discount_amount = parseInt($('#discount_amount').val())
+        $('#final_price').val(`Rs. ${(price - discount_amount).toLocaleString()}`)
+    }
+    $('#price').on('keyup', update_price)
+    $('#discount_amount').on('keyup', update_price)
+    $('#yt_trailer_id').on('keyup', function () {
+        $(this).val(
+            $(this).val().replace('https://www.youtube.com/watch?v=', '')
+            .replace('https://youtu.be/', '').split('?si')[0]
+        )
+        $('#yt-trailer-frame').attr('src', `https://www.youtube.com/embed/${$(this).val()}`)
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Add a change event listener to the file input
+        $("#game-file").on("change", function () {
+            // Check if a file is selected
+            if (this.files.length > 0) {
+                // Get the file name
+                const file = this.files[0];
+                const fileName = file.name
+                const fileSize = file.size
+                // Display the file name in the paragraph
+                $("#file-name").text(`${fileName} | ${((fileSize / 1024) / 1024).toFixed(2).toLocaleString()} MB`);
+            } else {
+                $("#file-name").text("No file chosen");
+            }
+        });
+    });
+</script>
+
+<script>
+    $('#banner').change(function(e) {
+        let file = e.target.files[0]
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                $('#banner_preview').attr("src", event.target.result).parent().show()
+            }
+            reader.readAsDataURL(file)
+        }
+    })
+</script>
+<script>
+    $('#screenshot').change(function(e) {
+        let file = e.target.files[0]
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                $('#screenshot_preview').attr("src", event.target.result).parent().show()
+            }
+            reader.readAsDataURL(file)
+        }
+    })
+</script>
+<script>
+    $('.genre-label').click(function () {
+        $(this).toggleClass('border-gray-400 text-gray-400 border-primary text-black bg-primary')
+    })
+
+    $('.platform-label').click(function () {
+        $(this).find('i').toggleClass('text-primary ph-fill ph text-gray-400')
+    })
+</script>
+{% block tab_highlight %}
+<script type="text/javascript">
+    $('.games-tab').addClass('text-secondary')
+    $('.games-tab').addClass('bg-gray-700')
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,13 +1,14 @@
 from .models import Game, GameRating, \
     GameReview, GameCode, GameScreenshot, \
-    GameOrder, GameVoucher, GameGenre, \
-    MinSystemRequirement, RecommendedSystemRequirement
+    GameOrder, GameVoucher, NewGameGenre, \
+    MinSystemRequirement, RecommendedSystemRequirement, \
+    GameBuild
 from django.contrib import admin
 
 # Register your models here.
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ['display_name', 'price', 'discount_amount', 'copies_sold', 'is_available_on_windows', 'is_available_on_linux', 'is_available_on_mac']
+    list_display = ['display_name', 'price', 'discount_amount', 'is_available_on_windows', 'is_available_on_linux', 'is_available_on_mac']
 
 @admin.register(GameRating)
 class GameRatingAdmin(admin.ModelAdmin):
@@ -29,9 +30,9 @@ class GameScreenshotAdmin(admin.ModelAdmin):
 class GameOrderAdmin(admin.ModelAdmin):
     list_display = ['order_id', 'buyer', 'total_price', 'is_payment_successful', 'order_date']
 
-@admin.register(GameGenre)
-class GameGenreAdmin(admin.ModelAdmin):
-    list_display = ["game"]
+@admin.register(NewGameGenre)
+class NewGameGenreAdmin(admin.ModelAdmin):
+    list_display = ["display_name"]
 
 @admin.register(MinSystemRequirement)
 class MinSystemRequirementAdmin(admin.ModelAdmin):
@@ -40,5 +41,9 @@ class MinSystemRequirementAdmin(admin.ModelAdmin):
 @admin.register(RecommendedSystemRequirement)
 class RecommendedSystemRequirementAdmin(admin.ModelAdmin):
     list_display = ["game"]
+
+@admin.register(GameBuild)
+class GameBuildAdmin(admin.ModelAdmin):
+    list_display = ["game", "id"]
     
 admin.site.register(GameVoucher)

@@ -3,286 +3,420 @@
 {% load custom_tag %}
 
 {% block title %}
-Buy {{game.display_name}} at Babal.Games
+  Buy {{ game.display_name }} at Babal.Games
 {% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="https://unpkg.com/slider-pro/dist/css/slider-pro.min.css" />
-<style>
-    .sp-buttons {
-        display: block;
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    #long_description ul {
+      list-style: disc;
     }
-
-    .sp-selected-button {
-        background-color: white;
+    #long_description img {
+      width: 100%;
     }
-
-    .sp-button {
-        border: 2px solid white;
+    #long_description p {
+      text-align: justify;
     }
-
-    .ytp-cued-thumbnail-overlay, .ytp-cued-thumbnail-overlay-image, .sp-slide, iframe {
-        z-index: -1 !important;
-    }
-
-    @media (min-width: 1024px) {
-        .sp-buttons {
-            display: none;
-        }
-    }
-</style>
+  </style>
 {% endblock %}
 
 {% block content %}
-<section class="container mt-10">
-    <div class="mx-auto max-w-7xl px-8 py-2">
-        {% comment %} <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
-            <div class="container">
-                <h2 class="text-2xl mt-6 mb-4">{{game.display_name}}</h2>
-                <div class="stars">
-
-                </div>
+  <section class="my-10">
+    <div class="grid grid-cols-10">
+      <div class="col-span-7">
+        <div class="swiper mySwiper w-4/5 h-full">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <iframe class="w-full h-[36rem] rounded" src="https://www.youtube.com/embed/{{ game.yt_trailer_id }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen;"></iframe>
             </div>
-        </div> {% endcomment %}
-
-        <div class="container flex flex-col lg:flex-row gap-4">
-            <div class="slider-pro" id="my-slider">
-                <div class="sp-slides">
-                    <!-- Slide 1 -->
-                    {% if game.yt_trailer_id != "" %}
-                    <div class="sp-slide cursor-pointer">
-                        <iframe class="h-full w-full" class="sp-image w-min" src="https://www.youtube.com/embed/{{game.yt_trailer_id}}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
-                    </div>
-                    {% endif %}
-                    <div class="sp-slide cursor-pointer">
-                        <img class="sp-image w-min" src="/media/{{game.banner}}" />
-                    </div>
-                    {% for screenshot in screenshots %}
-                    <div class="sp-slide cursor-pointer">
-                        <img class="sp-image" src="/media/{{screenshot.image}}">
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="sp-thumbnails hidden lg:block">
-                    {% if game.yt_trailer_id != "" %}
-                    <img class="sp-thumbnail cursor-pointer" class="sp-image w-min" src="https://img.youtube.com/vi/{{game.yt_trailer_id}}/maxresdefault.jpg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
-                    {% endif %}
-                    <img class="sp-thumbnail cursor-pointer" src="/media/{{game.banner}}" />
-                    {% for screenshot in screenshots %}
-                    <img class="sp-thumbnail cursor-pointer" src="/media/{{screenshot.image}}">
-                    {% endfor %}
-                </div>
+            <div class="swiper-slide">
+              <img class="w-full h-[36rem] object-cover rounded" src="/media/{{ game.banner }}" />
             </div>
-            <div class="flex flex-col items-center w-full lg:w-96 bg-gray-800 p-4 rounded text-gray-300 h-max">
-                <h1 class="w-full text-xl text-primary font-bold grid grid-cols-2"><span>{{game.display_name}}</span><span class="text-right">Rs. {{game.price |subtract:game.discount_amount}}</span></h1>
-                <div class="stars w-full mb-4 text-yellow-400 flex items-center gap-1">
-                    <!-- 1 star -->
-                    {% if rating.average >= 1 %}
-                    <i class="ph-fill ph-star"></i>
-                    {% elif rating.average > 0 %}
-                    <i class="ph-fill ph-star-half"></i>
-                    {% else %}
-                    <i class="ph-bold ph-star"></i>
-                    {% endif %}
-                    <!-- 2 star -->
-                    {% if rating.average >= 2 %}
-                    <i class="ph-fill ph-star"></i>
-                    {% elif rating.average > 1 %}
-                    <i class="ph-fill ph-star-half"></i>
-                    {% else %}
-                    <i class="ph-bold ph-star"></i>
-                    {% endif %}
-                    <!-- 3 star -->
-                    {% if rating.average >= 3 %}
-                    <i class="ph-fill ph-star"></i>
-                    {% elif rating.average > 2 %}
-                    <i class="ph-fill ph-star-half"></i>
-                    {% else %}
-                    <i class="ph-bold ph-star"></i>
-                    {% endif %}
-                    <!-- 4 star -->
-                    {% if rating.average >= 4 %}
-                    <i class="ph-fill ph-star"></i>
-                    {% elif rating.average > 3 %}
-                    <i class="ph-fill ph-star-half"></i>
-                    {% else %}
-                    <i class="ph-bold ph-star"></i>
-                    {% endif %}
-                    <!-- 5 star -->
-                    {% if rating.average == 5 %}
-                    <i class="ph-fill ph-star"></i>
-                    {% elif rating.average > 4 %}
-                    <i class="ph-fill ph-star-half"></i>
-                    {% else %}
-                    <i class="ph-bold ph-star"></i>
-                    {% endif %}
-                    <div class="average-rating text-gray-300">{{rating.average}} out
-                        of 5</div>
-                    <div class="total-ratings text-gray-400">({{rating.total}})</div>
-                </div>
-                <p class="leading-5 text-gray-400 mb-2 w-full"><span class="game-desc">{{game.description|truncatechars:200}}</span>
-                    {% if game.description|length > 200 %}
-                    <span id="desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</span>
-                    {% endif %}
-                </p>
-
-                <p class="flex justify-start w-full">
-                    {% for genre in genres %}
-                    <span class="bg-gray-700 hover:bg-gray-600 text-gray-400 mx-2 rounded-lg px-2">
-                        {{genre}}
-                    </span>
-                    {% endfor %}
-                </p>
-                <div class="flex flex-col w-full mb-10 mt-4">
-                    <p class="grid grid-cols-2 text-primary">
-                        <span>Developer</span> <span>Rockstar Games</span>
-                    </p>
-                    <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1">
-                    <p class="grid grid-cols-2 text-primary">
-                        <span>Publisher</span> <span>Rockstar Games</span>
-                    </p>
-                    <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1">
-                    <p class="grid grid-cols-2 text-primary">
-                        <span>Support</span> <span>Website</span>
-                    </p>
-                </div>
-
-                <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full mt-4 flex gap-1">
-                    {% csrf_token %}
-                    <button type="button"
-                        class="bg-gray-700 w-10 rounded text-primary">
-                        {% if game in wishlisted_games %}
-                        <i class="ph-fill ph-heart-straight"></i>
-                        {% else %}
-                        <i class="ph-bold ph-heart-straight"></i>
-                        {% endif %}
-                    </button>
-                    <button type="submit"
-                        class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add
-                        to basket</button>
-                </form>
-            </div>
+            {% for screenshot in screenshots %}
+              <div class="swiper-slide">
+                <img class="w-full h-full object-cover rounded" src="/media/{{ screenshot.image }}" />
+              </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
         </div>
-        <div class="w-1/2">
-            <div class="my-6 container game-info">
-                <h1 class="text-primary text-2xl mb-4 font-bold">About the Game</h1>
-                <p class="text-gray-200 game-long-desc">
-                    {{game.long_description|truncatechars:400|linebreaksbr}}
-                    {% if game.long_description|length > 400 %}
-                        <button id="long-desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</button>
-                    {% endif %}
-                </p>
-                <h1 class="text-primary text-2xl mb-4 font-bold mt-8">System Requirements</h1>
-                <div class="grid grid-cols-2 gap-0">
-                    <div class="minimum">
-                        <h3 class="uppercase font-bold">Minimum</h3>
-                        <p><span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">Windows 10 64 Bit</span></p>
-                        <p><span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz</span></p>
-                        <p><span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">4 GB RAM</span></p>
-                        <p><span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">NVIDIA 9800 GT 1GB / AMD HD 4870 1GB (DX 10, 10.1, 11)</span></p>
-                        <p><span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">120 GB available space</span></p>
-                    </div>
-                    <div class="recommended">
-                        <h3 class="uppercase font-bold">Recommended</h3>
-                        <p><span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">Windows 10 64 Bit</span></p>
-                        <p><span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">Intel Core i5 3470 @ 3.2GHz (4 CPUs) / AMD X8 FX-8350 @ 4GHz (8 CPUs)</span></p>
-                        <p><span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">8 GB RAM</span></p>
-                        <p><span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">NVIDIA GTX 660 2GB / AMD HD 7870 2GB</span></p>
-                        <p><span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">120 GB available space</span></p>
-                    </div>
-                </div>
-                <h1 class="text-primary text-2xl mb-4 mt-8 font-bold">Reviews</h1>
-                {% if reviews.count < 1 %}
-                <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
-                    <span class="text-xl text-black"><i class="ph ph-warning"></i> No reviews available for this game!</span>
-                </div>
-                {% endif %}
-                {% for review in reviews %}
-                <div class="bg-gray-800 p-4 rounded">
-                    <div class="flex justify-between items-center">
-                        <p class="text-primary text-xl">{{review.reviewer.username}}</p>
-                        <div class="stars text-yellow-400 flex items-center gap-1">
-                            <!-- 1 star -->
-                            <i class="ph-fill ph-star"></i>
-                            <!-- 2 star -->
-                            {% if review.rating >= 2 %}
-                            <i class="ph-fill ph-star"></i>
-                            {% else %}
-                            <i class="ph-bold ph-star"></i>
-                            {% endif %}
-                            <!-- 3 star -->
-                            {% if review.rating >= 3 %}
-                            <i class="ph-fill ph-star"></i>
-                            {% else %}
-                            <i class="ph-bold ph-star"></i>
-                            {% endif %}
-                            <!-- 4 star -->
-                            {% if review.rating >= 4 %}
-                            <i class="ph-fill ph-star"></i>
-                            {% else %}
-                            <i class="ph-bold ph-star"></i>
-                            {% endif %}
-                            <!-- 5 star -->
-                            {% if review.rating == 5 %}
-                            <i class="ph-fill ph-star"></i>
-                            {% else %}
-                            <i class="ph-bold ph-star"></i>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <p class="text-gray-300">{{review.review}}</p>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="similar-games">
-                {% comment %} Work needs to be done here {% endcomment %}
-            </div>
+      </div>
+      <div class="col-span-3 mr-10 flex flex-col justify-between bg-gray-800 p-2">
+        <div class="">
+          <h1 class="text-xl text-primary font-bold grid grid-cols-2 w-full"><span>{{ game.display_name }}</span><span class="text-right">Rs. {{ game.price|subtract:game.discount_amount }}</span></h1>
+          <a class="stars w-full mb-4 text-yellow-400 flex items-center gap-1" href="#reviews">
+            <!-- 1 star -->
+            {% if rating.average >= 1 %}
+              <i class="ph-fill ph-star"></i>
+            {% elif rating.average > 0 %}
+              <i class="ph-fill ph-star-half"></i>
+            {% else %}
+              <i class="ph-bold ph-star"></i>
+            {% endif %}
+            <!-- 2 star -->
+            {% if rating.average >= 2 %}
+              <i class="ph-fill ph-star"></i>
+            {% elif rating.average > 1 %}
+              <i class="ph-fill ph-star-half"></i>
+            {% else %}
+              <i class="ph-bold ph-star"></i>
+            {% endif %}
+            <!-- 3 star -->
+            {% if rating.average >= 3 %}
+              <i class="ph-fill ph-star"></i>
+            {% elif rating.average > 2 %}
+              <i class="ph-fill ph-star-half"></i>
+            {% else %}
+              <i class="ph-bold ph-star"></i>
+            {% endif %}
+            <!-- 4 star -->
+            {% if rating.average >= 4 %}
+              <i class="ph-fill ph-star"></i>
+            {% elif rating.average > 3 %}
+              <i class="ph-fill ph-star-half"></i>
+            {% else %}
+              <i class="ph-bold ph-star"></i>
+            {% endif %}
+            <!-- 5 star -->
+            {% if rating.average == 5 %}
+              <i class="ph-fill ph-star"></i>
+            {% elif rating.average > 4 %}
+              <i class="ph-fill ph-star-half"></i>
+            {% else %}
+              <i class="ph-bold ph-star"></i>
+            {% endif %}
+            <div class="average-rating text-gray-300">{{ rating.average }} out of 5</div>
+            <div class="total-ratings text-gray-400">({{ rating.total }})</div>
+          </a>
+          <p class="leading-5 text-gray-400 mb-2 w-full">
+            <span class="game-desc">{{ game.description|truncatechars:200 }}</span>
+            {% if game.description|length > 200 %}
+              <span id="desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</span>
+            {% endif %}
+          </p>
+
+          <p class="flex-wrap px-2 w-full">
+            {% for genre in game.genre.all %}
+              <span class="bg-gray-700 hover:bg-gray-600 text-gray-400 mx-2 rounded-lg text-nowrap"><a href="{% url 'genrepage' genre.slug %}" class="px-2">{{ genre }}</a></span>
+            {% endfor %}
+          </p>
+          <div class="flex flex-col w-full mb-10 mt-4">
+            <p class="grid grid-cols-2 text-primary">
+              <span>Developer</span> <span>{{ game.developer }}</span>
+            </p>
+            <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1" />
+            <p class="grid grid-cols-2 text-primary">
+              <span>Publisher</span> <span>{{ game.publisher }}</span>
+            </p>
+            <hr class="border-x-0 border-t-0 border-b-[1px] border-gray-400 my-1" />
+            <p class="grid grid-cols-2 text-primary">
+              <span>Support</span> <span><a href="{{ game.support_url }}" target="_blank">Website</a></span>
+            </p>
+          </div>
         </div>
 
+        <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full mt-4 flex gap-1">
+          {% csrf_token %}
+          <button type="button" class="bg-gray-700 w-10 rounded text-primary" onclick="addToWishlist()">
+            {% if game in wishlisted_games %}
+              <i class="ph-fill ph-heart-straight"></i>
+            {% else %}
+              <i class="ph-bold ph-heart-straight"></i>
+            {% endif %}
+          </button>
+          {% if already_owned %}
+            <button type="button" class="w-full uppercase text-black bg-secondary cursor-not-allowed py-2 font-bold">In Library</button>
+          {% elif build_available %}
+            <button type="submit" class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add to basket</button>
+          {% else %}
+            <button type="button" class="w-full uppercase text-black bg-yellow-600 cursor-not-allowed py-2 font-bold">Out of Stock</button>
+          {% endif %}
+        </form>
+      </div>
     </div>
-</section>
+    <div class="grid grid-cols-12 gap-10 pl-28 mt-10">
+      <div class="my-6 container game-info col-span-7">
+        <h1 class="text-primary text-2xl mb-4 font-bold">About the Game</h1>
+        <div class="text-gray-200 text-justify flex flex-col gap-5" id="long_description">
+          {{ game.long_description|safe }}
+          {% comment %} <p class="game-long-desc">{{ game.long_description|truncatechars:1000|linebreaksbr|safe }}</p>
+          {% if game.long_description|length > 400 %}
+            <button id="long-desc-show-more" class="hover:cursor-pointer hover:text-secondary text-primary" status="closed">Show more</button>
+          {% endif %} {% endcomment %}
+        </div>
+        <h1 class="text-primary text-2xl mb-4 font-bold mt-8">System Requirements</h1>
+        <div>
+          <div class="grid grid-cols-2 gap-0 mb-4">
+            <div class="minimum">
+              <h3 class="uppercase font-bold">Minimum</h3>
+              <p>
+                <span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">{{ system_requirement.min.os }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">{{ system_requirement.min.processor }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">{{ system_requirement.min.memory }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">{{ system_requirement.min.graphics }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">{{ system_requirement.min.storage }}</span>
+              </p>
+            </div>
+            <div class="recommended">
+              <h3 class="uppercase font-bold">Recommended</h3>
+              <p>
+                <span class="text-gray-400">OS:</span> <span class="text-gray-200 text-sm">{{ system_requirement.rec.os }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Processor:</span> <span class="text-gray-200 text-sm">{{ system_requirement.rec.processor }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Memory</span> <span class="text-gray-200 text-sm">{{ system_requirement.rec.memory }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Graphics:</span> <span class="text-gray-200 text-sm">{{ system_requirement.rec.graphics }}</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Storage:</span> <span class="text-gray-200 text-sm">{{ system_requirement.rec.storage }}</span>
+              </p>
+            </div>
+          </div>
+          {% if system_requirement.min.additional_note %}
+            <h3 class="uppercase font-bold">Additional Note</h3>
+            <p class="text-gray-400">{{ system_requirement.min.additional_note }}</p>
+          {% endif %}
+        </div>
+        <h1 class="text-primary text-2xl mb-4 mt-8 font-bold" id="reviews">Reviews</h1>
+        <div class="">
+          <div>
+            <p>
+              <span class="text-6xl">{{ rating.average }}</span><span class="text-gray-400 text-3xl">/5</span>
+            </p>
+            <div class="stars text-yellow-400 text-3xl">
+              <!-- 1 star -->
+              {% if rating.average >= 1 %}
+                <i class="ph-fill ph-star"></i>
+              {% elif rating.average > 0 %}
+                <i class="ph-fill ph-star-half"></i>
+              {% else %}
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+              <!-- 2 star -->
+              {% if rating.average >= 2 %}
+                <i class="ph-fill ph-star"></i>
+              {% elif rating.average > 1 %}
+                <i class="ph-fill ph-star-half"></i>
+              {% else %}
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+              <!-- 3 star -->
+              {% if rating.average >= 3 %}
+                <i class="ph-fill ph-star"></i>
+              {% elif rating.average > 2 %}
+                <i class="ph-fill ph-star-half"></i>
+              {% else %}
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+              <!-- 4 star -->
+              {% if rating.average >= 4 %}
+                <i class="ph-fill ph-star"></i>
+              {% elif rating.average > 3 %}
+                <i class="ph-fill ph-star-half"></i>
+              {% else %}
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+              <!-- 5 star -->
+              {% if rating.average == 5 %}
+                <i class="ph-fill ph-star"></i>
+              {% elif rating.average > 4 %}
+                <i class="ph-fill ph-star-half"></i>
+              {% else %}
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% if user_purchased_game %}
+          <form method="post">
+            {% csrf_token %}
+            <textarea id="review_content" class="p-4 w-full rounded bg-gray-800 h-40 outline-none border-none focus:outline-primary mt-5" placeholder="Write a review for this game" name="review_content">{% if user_review %}{{ user_review.review }}{% endif %}</textarea>
+            <div class="w-full flex justify-between items-center">
+              <div class="flex gap-2" id="starContainer">
+                <i class="ph ph-star text-3xl text-gray-400 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="1"></i>
+                <i class="ph ph-star text-3xl text-gray-400 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="2"></i>
+                <i class="ph ph-star text-3xl text-gray-400 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="3"></i>
+                <i class="ph ph-star text-3xl text-gray-400 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="4"></i>
+                <i class="ph ph-star text-3xl text-gray-400 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="5"></i>
+                <input type="number" class="hidden" name="rating" id="ratingInput" value="0" />
+              </div>
+              <button type="submit" class="my-2 border-2 border-primary px-2 py-1 rounded text-primary hover:bg-primary hover:text-black">
+                {% if user_review %}
+                  Update
+                {% else %}
+                  Add
+                {% endif %}Review
+              </button>
+            </div>
+          </form>
+        {% endif %}
+        {% if reviews.count <= 0 %}
+          <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+            <span class="text-xl text-black"><i class="ph ph-warning"></i> No reviews available for this game!</span>
+          </div>
+        {% endif %}
+        {% for review in reviews %}
+          <div class="bg-gray-800 p-4 rounded my-2">
+            <div class="flex justify-between items-center">
+              <p class="text-primary text-xl">{{ review.reviewer.username }}</p>
+              <div class="stars text-yellow-400 flex items-center gap-1">
+                <!-- 1 star -->
+                <i class="ph-fill ph-star"></i>
+                <!-- 2 star -->
+                {% if review.rating >= 2 %}
+                  <i class="ph-fill ph-star"></i>
+                {% else %}
+                  <i class="ph-bold ph-star"></i>
+                {% endif %}
+                <!-- 3 star -->
+                {% if review.rating >= 3 %}
+                  <i class="ph-fill ph-star"></i>
+                {% else %}
+                  <i class="ph-bold ph-star"></i>
+                {% endif %}
+                <!-- 4 star -->
+                {% if review.rating >= 4 %}
+                  <i class="ph-fill ph-star"></i>
+                {% else %}
+                  <i class="ph-bold ph-star"></i>
+                {% endif %}
+                <!-- 5 star -->
+                {% if review.rating == 5 %}
+                  <i class="ph-fill ph-star"></i>
+                {% else %}
+                  <i class="ph-bold ph-star"></i>
+                {% endif %}
+              </div>
+            </div>
+            <p class="text-gray-300">{{ review.review }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="similar-games col-span-5 my-6 pr-10">
+        <h1 class="text-primary text-2xl mb-4 font-bold">You might also like</h1>
+        {% for game in recommendation.you_might_also_like %}
+          <div class="bg-gray-800 mb-2 p-2 rounded flex justify-between items-center">
+            <div class="flex gap-2 items-center">
+              <a href="{% url 'gamepage' game.slug %}">
+              <img src="/media/{{ game.banner }}" class="w-32 h-16 object-cover rounded" />
+              </a>
+              <a class="text-primary" href="{% url 'gamepage' game.slug %}">{{ game.display_name }}</a>
+            </div>
+            <div class="flex items-center gap-2">
+              {% if game.discount_amount != 0 %}
+              <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+              {% endif %}
+              <div class="flex flex-col items-center">
+                <p>Rs. {{ game.price|subtract:game.discount_amount }}</p>
+                {% if game.discount_amount > 0 %}
+                <p class="text-gray-400 line-through">Rs. {{ game.price }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 {% endblock %}
 {% block scripts %}
-<script type="text/javascript" src="https://unpkg.com/slider-pro/dist/js/jquery.sliderPro.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-<script type="text/javascript">
-    $('#desc-show-more').click(function() {
-        if ($(this).attr('status') == 'closed') {
-            $(this).attr('status', 'open');
-            $(this).text('Show less');
-            $('.game-desc').text(`{{game.description}}`);
-        } else {
-            $(this).attr('status', 'closed');
-            $(this).text('Show more');
-            $('.game-desc').text('{{game.description|truncatechars:200}}');
-        }
-    });
+  <script type="text/javascript">
+    var swiper = new Swiper('.mySwiper', {
+      loop: true,
+      spaceBetween: 30,
+      effect: 'fade',
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+      }
+    })
+  </script>
 
-    $('#long-desc-show-more').click(function() {
-        if ($(this).attr('status') == 'closed') {
-            $(this).attr('status', 'open');
-            $(this).text('Show less');
-            $('.game-long-desc').html(`{{game.long_description|linebreaksbr}}`);
-        } else {
-            $(this).attr('status', 'closed');
-            $(this).text('Show more');
-            $('.game-long-desc').html('{{game.long_description|truncatechars:400|linebreaksbr}}');
-        }
-    });
-</script>
-<script type="text/javascript">
-    $('#my-slider').sliderPro({
-        width: 720,
-        height: 420,
-        arrows: false,
-        buttons: true,
-        fullScreen: false,
-        shuffle: false,
-        smallSize: 500,
-        mediumSize: 1000,
-        largeSize: 3000,
-        thumbnailArrows: true,
-        autoplay: false
-    });
-</script>
+  <script type="text/javascript">
+    $('#desc-show-more').click(function () {
+      if ($(this).attr('status') == 'closed') {
+        $(this).attr('status', 'open')
+        $(this).text('Show less')
+        $('.game-desc').text(`{{game.description}}`)
+      } else {
+        $(this).attr('status', 'closed')
+        $(this).text('Show more')
+        $('.game-desc').text('{{game.description|truncatechars:200}}')
+      }
+    })
+    
+    $('#long-desc-show-more').click(function () {
+      if ($(this).attr('status') == 'closed') {
+        $(this).attr('status', 'open')
+        $(this).text('Show less')
+        $('.game-long-desc').html(`{{game.long_description|linebreaksbr}}`)
+      } else {
+        $(this).attr('status', 'closed')
+        $(this).text('Show more')
+        $('.game-long-desc').html('{{game.long_description|truncatechars:1000|linebreaksbr}}')
+      }
+    })
+  </script>
+  <script>
+    $(document).ready(function () {
+      const stars = $('#starContainer i')
+    
+      // Handle star click
+      stars.click(function () {
+        const rating = $(this).data('rating')
+        $('#ratingInput').val(rating)
+        updateStars(rating)
+      })
+    
+      // Update star appearance
+      function updateStars(rating) {
+        stars.each(function (index) {
+          if (index < rating) {
+            $(this).removeClass('ph').addClass('ph-fill text-yellow-400')
+          } else {
+            $(this).removeClass('ph-fill text-yellow-400').addClass('ph')
+          }
+        })
+      }
+    
+      // Handle form submission
+      $('#ratingForm').submit(function (e) {
+        e.preventDefault()
+        const rating = $('#ratingInput').val()
+      })
+    })
+  </script>
+  {% if user_purchased_game and user_review %}
+    <script type="text/javascript">
+    $(document).ready(function () {
+      function updateStars(rating) {
+        $('#ratingInput').val(rating)
+        $('#starContainer i').each(function (index) {
+          if (index < rating) {
+            $(this).removeClass('ph').addClass('ph-fill text-yellow-400')
+          } else {
+            $(this).removeClass('ph-fill text-yellow-400').addClass('ph')
+          }
+        })
+      }
+      updateStars({{ user_review.rating }})
+    })
+  </script>
+  {% endif %}
 {% endblock %}
