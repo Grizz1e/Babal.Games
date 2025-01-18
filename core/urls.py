@@ -14,7 +14,6 @@ urlpatterns = [
     path('profile/settings', account_views.settingspage, name='settingspage'),
     path('profile', views.profilepage, name='profilepage'),
 
-    path('search/', views.searchpage, name='searchpage'),
     path('result/', views.resultpage, name='resultpage'),
 
 ]

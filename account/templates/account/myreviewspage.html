@@ -4,6 +4,7 @@
 
 {% block profile_content %}
     <div class="container mt-4">
+        {% if user_reviews %}
         {% for review in user_reviews %}
         <h1 class="mt-4 text-gray-400">{{review.review_date}}</h1>
         <div class="row">
@@ -52,6 +53,11 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+          <span class="text-xl text-black"><i class="ph ph-warning"></i> No reviews available!</span>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}
 

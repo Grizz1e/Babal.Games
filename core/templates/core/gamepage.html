@@ -131,7 +131,7 @@
           {% elif build_available %}
             <button type="submit" class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add to basket</button>
           {% else %}
-            <button type="button" class="w-full uppercase text-black bg-yellow-600 cursor-not-allowed py-2 font-bold">Out of Stock</button>
+            <button type="button" class="w-full uppercase text-black bg-yellow-600 cursor-not-allowed py-2 font-bold">Unavailable</button>
           {% endif %}
         </form>
       </div>
@@ -241,7 +241,7 @@
             </div>
           </div>
         </div>
-        {% if user_purchased_game %}
+        {% if already_owned %}
           <form method="post">
             {% csrf_token %}
             <textarea id="review_content" class="p-4 w-full rounded bg-gray-800 h-40 outline-none border-none focus:outline-primary mt-5" placeholder="Write a review for this game" name="review_content">{% if user_review %}{{ user_review.review }}{% endif %}</textarea>

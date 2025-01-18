@@ -1,16 +1,16 @@
 {% extends 'dashboard/base.html' %}
 {% block title %}
-  Admin Dashboard | Babal.Games
+  Admin Dashboard | Babal.Store
 {% endblock %}
 
 {% block dashboard_content %}
   <section class="flex items-center mr-10 gap-10">
     <div>
       <div class="mb-5">
-        <span class="text-3xl">Total Sales</span>
+        <span class="text-3xl">Top Sales</span>
       </div>
       <div class="h-60 flex justify-center items-center">
-        <canvas id="total-sales-chart"></canvas>
+        <canvas id="top-sales-chart"></canvas>
       </div>
     </div>
     <div class="w-full">
@@ -30,7 +30,7 @@
       </div>
       <div class="grid grid-cols-2 gap-2 items-center">
         <p class="flex flex-col bg-gray-700 p-8 rounded items-center text-center">
-          <span class="text-xl">Total Games</span>
+          <span class="text-xl">Total Apps</span>
           <span class="text-3xl">{{ total_games }}</span>
         </p>
         <p class="flex flex-col bg-gray-700 p-8 rounded items-center text-center">
@@ -111,14 +111,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    const ctx = document.getElementById('total-sales-chart');
+    const ctx = document.getElementById('top-sales-chart');
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Sold', 'Remaining'],
+            labels: {{ top_sales.games|safe }},
             datasets: [{
-                label: 'Total Games',
-                data: [{{ total_sales.sold }}, {{ total_sales.remaining }}],
+                label: 'Total Sold',
+                data: {{ top_sales.user_count }},
             }]
         },
         options: {

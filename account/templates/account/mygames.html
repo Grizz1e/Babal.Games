@@ -3,24 +3,7 @@
 {% block title %}{{user.username}}'s Games | Babal.Games{% endblock %}
     {% block profile_content %}
     <div class="w-full mt-4 gap-4">
-        <div class="flex justify-end gap-4">
-            <form class="flex m-0 gap-2">
-                <div class="flex items-center gap-2">
-                    <p class="text-gray-300">Sort by:</p>
-                    <select name="sort" id="sort" class="bg-gray-800 rounded p-2">
-                        <option value="price">Price</option>
-                        <option value="display_name">Name</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-2">
-                    <p class="text-gray-300">Order:</p>
-                    <select name="order" id="order" class="bg-gray-800 rounded p-2">
-                        <option value="+">Ascending</option>
-                        <option value="-">Descending</option>
-                    </select>
-                </div>
-            </form>
-        </div>
+        {% if licensed_games %}
         {% for game in licensed_games %}
         <div class="bg-gray-800 mt-2 rounded p-4">
             <div class="flex justify-between items-center">
@@ -35,6 +18,11 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+          <span class="text-xl text-black"><i class="ph ph-warning"></i> No products purchased yet!</span>
+        </div>
+        {% endif %}
     </div>
     {% endblock %}
     {% block tab_highlight %}

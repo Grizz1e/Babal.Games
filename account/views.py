@@ -75,8 +75,6 @@ def change_avatar(request):
 
 @login_required(login_url="authpage")
 def orderhistorypage(request):
-    recommendation = GameRecommendationService(request.user)
-    print(recommendation.get_top_rated_games(min_reviews=0))
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
         try:
@@ -150,6 +148,42 @@ def myreviewspage(request):
 
 @login_required(login_url="authpage")
 def settingspage(request):
+    user = request.user
+    if request.method == "POST":
+        new_email = request.POST.get('email')
+        new_first_name = request.POST.get('first_name')
+        new_last_name = request.POST.get('last_name')
+        delete_user = request.POST.get('delete_user')
+
+        current_pass = request.POST.get('current_password')
+        new_pass = request.POST.get('new_password')
+        confirm_pass = request.POST.get('confirm_password')
+        if current_pass is not None and new_pass is not None and new_pass == confirm_pass:
+            if user.check_password(current_pass):
+                user.set_password(new_pass)
+                user.save()
+                messages.success(request, "Password Changed")
+
+
+
+        if new_email is not None:
+            user.email = new_email
+            user.save()
+            messages.success(request, "Email Changed")
+
+        if new_first_name is not None:
+            user.first_name = new_first_name
+            user.save()
+            messages.success(request, "First Name Changed")
+
+        if new_last_name is not None:
+            user.last_name = new_last_name
+            user.save()
+            messages.success(request, "Last Name Changed")
+
+        if delete_user is not None:
+            user.delete()
+            messages.success(request, "User deleted successfully")
     context = {}
     user_profile = UserProfile.objects.get(user=request.user)
     total_avatar_count = ProfileAvatar.objects.all().count()

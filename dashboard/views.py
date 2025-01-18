@@ -17,8 +17,11 @@ from markdown import markdown
 
 def dashboard_overview(request):
     logs = LogEntry.objects.select_related('user', 'content_type').order_by('-action_time')
-    total_sold = GameCode.objects.filter(is_sold=True).count()
-    total_remaining = GameCode.objects.filter(is_sold=False).count()
+    top_sales = Game.objects.annotate(
+        licensed_user_count=Count('licensed_to')
+    ).order_by('-licensed_user_count')[:5]
+    game_names = [game.display_name for game in top_sales]
+    user_counts = [game.licensed_user_count for game in top_sales]
 
     p = Paginator(logs, 5)
     page = request.GET.get('page')
@@ -28,9 +31,9 @@ def dashboard_overview(request):
 
     context = {}
     context['log_entries'] = log_entries
-    context['total_sales'] = {
-        'sold': total_sold,
-        'remaining': total_remaining,
+    context['top_sales'] = {
+        'games': game_names,
+        'user_count': user_counts
     }
     context['last_week'] = {
         'labels': labels,
@@ -44,9 +47,9 @@ def dashboard_overview(request):
 def dashboard_games(request):
     q = request.GET.get('q')
     if not q:
-        game_list = Game.objects.all()
+        game_list = Game.objects.all().order_by('display_name')
     else:
-        game_list = Game.objects.filter(display_name__icontains=q)
+        game_list = Game.objects.filter(display_name__icontains=q).order_by('display_name')
     p = Paginator(game_list, 6)
     page = request.GET.get('page')
     games = p.get_page(page)
@@ -74,6 +77,11 @@ def dashboard_game_page(request, id):
         new_support_url = request.POST.get('game_support')
         new_steam_id = request.POST.get('steam_id')
         new_yt_trailer_id = request.POST.get('yt_trailer_id')
+
+        delete_game = request.POST.get('delete_game')
+
+        if delete_game is not None:
+            game.delete()
 
         if new_display_name is not None:
             game.display_name = new_display_name
@@ -457,3 +465,13 @@ def dashboard_manage_user(request, id):
     }
     
     return render(request, 'dashboard/manage_user.html', context)
+
+def dashboard_reviews(request):
+    reviews = GameReview.objects.all().order_by("review_date")
+    p = Paginator(reviews, 10)
+    page = request.GET.get('page')
+    reviews = p.get_page(page)
+    context = {
+        'reviews': reviews
+    }
+    return render(request, 'dashboard/reviews.html', context)

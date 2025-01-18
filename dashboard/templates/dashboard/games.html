@@ -17,7 +17,7 @@
         <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a game" name="q" value="{{ request.GET.q }}" />
         <button type="submit">Go</button>
       </form>
-      <a href="{% url 'dashboard_add_game' %}?referer=dashboard_games&page={{ request.GET.page }}&q={{ request.GET.q }}" class="hover:bg-primary text-primary hover:text-black border-2 border-primary px-2 rounded">Add a new game</a>
+      <a href="{% url 'dashboard_add_game' %}?referer=dashboard_games&page={{ request.GET.page }}&q={{ request.GET.q }}" class="hover:bg-primary text-primary hover:text-black border-2 border-primary px-2 rounded">Add a new product</a>
     </div>
     <div class="px-5 w-full">
       <div class="grid grid-cols-3 w-full">

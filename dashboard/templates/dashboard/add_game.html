@@ -15,7 +15,7 @@
             <a href="{% if request.GET.referer %}{% url request.GET.referer %}{% else %}{% url 'dashboard_games' %}{% endif %}?page={{request.GET.page}}&q={{request.GET.q}}">
                 <i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i>
             </a>
-            <h1 class="text-3xl">Add a New Game</h1>
+            <h1 class="text-3xl">Add a New Product</h1>
         </div>
     </div>
     <form class="m-0 p-0" method="post" enctype="multipart/form-data">
@@ -144,7 +144,7 @@
                         <input required class="hidden" id="banner" name="banner" type="file" accept="image/*">
                 </div>
                 <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
-                    <label for="game-file" class="text-2xl w-full">Game File</label>
+                    <label for="game-file" class="text-2xl w-full">Build File</label>
                     <div class="w-96 h-52 relative group bg-gray-600 rounded">
                         <label for="game-file" class="text-center">
                             <i class="text-gray-400 hover:text-white group-hover:block text-7xl ph ph-file-archive absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>

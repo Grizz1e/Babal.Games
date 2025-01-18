@@ -1,5 +1,5 @@
 from .models import GameOrder, GameVoucher, Game, GameReview
-from django.db.models import Count, Q, F, Avg, ExpressionWrapper, FloatField
+from django.db.models import Count, Q, F, Avg, ExpressionWrapper, FloatField, Case, When
 from django.db.models.functions import Cast
 from django.contrib.auth import get_user_model
 from collections import Counter
@@ -60,6 +60,11 @@ class GameRecommendationService:
         self.user = user
         self.User = get_user_model()
         self.is_authenticated = user is not None and user.is_authenticated
+    
+    def get_similar_games(self, game:Game, limit:int=5):
+        return Game.objects.filter(
+            genre__in=game.genre.all()
+        ).exclude(id=game.id).distinct()[:limit]
 
     def get_user_genre_preferences(self):
         """Calculate genre preferences based on user's purchase history."""
@@ -98,35 +103,75 @@ class GameRecommendationService:
         ).filter(common_games__gte=min_common_games)
 
         return similar_users
+    
+    def get_top_rated_games(self, limit:int=6, min_number_of_rating:int=10):
 
-    def get_top_rated_games(self, limit=6, min_reviews=0):
-        """Get top rated games using a weighted scoring system."""
-        # First, get the mean rating across all games with minimum reviews
-        overall_mean = Game.objects.annotate(
-            review_count=Count('reviews'),
-            avg_rating=Avg('reviews__rating')
-        ).filter(
-            review_count__gte=min_reviews
-        ).aggregate(
-            mean=Avg('avg_rating')
-        )['mean'] or 0
-
-        dampening_factor = float(min_reviews) * 2
-
-        top_games = Game.objects.annotate(
-            review_count=Count('reviews'),
-            avg_rating=Avg('reviews__rating')
-        ).filter(
-            review_count__gte=min_reviews
-        ).annotate(
-            weighted_rating=ExpressionWrapper(
-                (Cast('review_count', FloatField()) / (Cast('review_count', FloatField()) + dampening_factor) * Cast('avg_rating', FloatField())) +
-                (dampening_factor / (Cast('review_count', FloatField()) + dampening_factor) * overall_mean),
+        # Calculate the mean of average ratings (C)
+        all_games = Game.objects.annotate(
+            total_ratings=(
+                F('gamerating__five_stars') +
+                F('gamerating__four_stars') +
+                F('gamerating__three_stars') +
+                F('gamerating__two_stars') +
+                F('gamerating__one_stars')
+            ),
+            total_score=(
+                5 * F('gamerating__five_stars') +
+                4 * F('gamerating__four_stars') +
+                3 * F('gamerating__three_stars') +
+                2 * F('gamerating__two_stars') +
+                1 * F('gamerating__one_stars')
+            ),
+            average_rating=Case(
+                When(total_ratings=0, then=0),
+                default=F('total_score') / F('total_ratings'),
                 output_field=FloatField()
             )
-        ).order_by('-weighted_rating')[:limit]
+        )
 
-        return top_games
+        # Calculate C (mean average rating)
+        total_ratings_count = all_games.aggregate(total=Sum('total_ratings'))['total']
+        total_average_rating = all_games.aggregate(total=Sum('total_score'))['total']
+        C = total_average_rating / total_ratings_count if total_ratings_count else 0
+
+        # Annotate games with weighted score
+        top_rated_games = all_games.annotate(
+            weighted_score=(
+                (F('total_ratings') * F('average_rating') + min_number_of_rating * C) / (F('total_ratings') + min_number_of_rating)
+            )
+        ).order_by('-weighted_score')[:limit]  # Limit to top 5 games
+
+        return top_rated_games
+
+
+    # def get_top_rated_games(self, limit=6, min_reviews=0):
+    #     """Get top rated games using a weighted scoring system."""
+    #     # First, get the mean rating across all games with minimum reviews
+    #     overall_mean = Game.objects.annotate(
+    #         review_count=Count('reviews'),
+    #         avg_rating=Avg('reviews__rating')
+    #     ).filter(
+    #         review_count__gte=min_reviews
+    #     ).aggregate(
+    #         mean=Avg('avg_rating')
+    #     )['mean'] or 0
+
+    #     dampening_factor = float(min_reviews) * 2
+
+    #     top_games = Game.objects.annotate(
+    #         review_count=Count('reviews'),
+    #         avg_rating=Avg('reviews__rating')
+    #     ).filter(
+    #         review_count__gte=min_reviews
+    #     ).annotate(
+    #         weighted_rating=ExpressionWrapper(
+    #             (Cast('review_count', FloatField()) / (Cast('review_count', FloatField()) + dampening_factor) * Cast('avg_rating', FloatField())) +
+    #             (dampening_factor / (Cast('review_count', FloatField()) + dampening_factor) * overall_mean),
+    #             output_field=FloatField()
+    #         )
+    #     ).order_by('-weighted_rating')[:limit]
+
+    #     return top_games
 
     def get_top_selling_games(self):
         # Step 1: Filter GameOrders that are completed

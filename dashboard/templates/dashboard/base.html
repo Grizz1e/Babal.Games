@@ -10,7 +10,7 @@
         <a class="grid grid-flow-col items-center" href="{% url 'dashboard_overview' %}"><i class="ph ph-chart-line"></i><span>Overview</span></a>
       </li>
       <li class="games-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
-        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_games' %}"><i class="ph ph-game-controller"></i><span>Games</span></a>
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_games' %}"><i class="ph ph-game-controller"></i><span>Products</span></a>
       </li>
       <li class="users-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
         <a class="grid grid-flow-col items-center" href="{% url 'dashboard_users' %}"><i class="ph ph-users"></i><span>Users</span></a>
@@ -24,13 +24,10 @@
       <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
         <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-mask-happy"></i><span>Genres</span></a>
       </li>
-      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
-        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-star"></i><span>Ratings</span></a>
+      <li class="reviews-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_reviews' %}"><i class="ph ph-chat-text"></i><span>Reviews</span></a>
       </li>
-      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
-        <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-chat-text"></i><span>Reviews</span></a>
-      </li>
-      <li class="genres-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
+      <li class="log-out-tab text-xl hover:bg-gray-700 w-full hover:cursor-pointer hover:text-secondary p-2">
         <a class="grid grid-flow-col items-center" href="{% url 'dashboard_genres' %}"><i class="ph ph-sign-out"></i><span>Log Out</span></a>
       </li>
     </ul>

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
+from django.db.models import Avg, Count, F, FloatField
+from django.db.models.functions import Cast
 import uuid, os
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -58,6 +60,38 @@ class Game(models.Model):
     publisher = models.CharField(max_length=100, blank=True, null=True)
     support_url = models.CharField(max_length=250, blank=True, null=True)
 
+    def get_weighted_rating(self, min_votes:int=10, mean_vote:float=3.5):
+        reviews = self.gamereview_set.all()
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        review_count = reviews.count()
+        
+        if not avg_rating or not review_count:
+            return 0
+        
+        weighted_rating = (
+            (review_count / (review_count + min_votes) * avg_rating) +
+            (min_votes / (review_count + min_votes) * mean_vote)
+        )
+        
+        return round(weighted_rating, 2)
+    
+    @staticmethod
+    def get_top_rated_games(limit=10, min_votes:int=10, mean_vote:float=3.5):
+
+        return Game.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews'),
+            weighted_rating=Cast(
+                (
+                    (F('review_count') / (F('review_count') + min_votes) * F('avg_rating')) +
+                    (min_votes / (F('review_count') + min_votes) * mean_vote)
+                ),
+                FloatField()
+            )
+        ).filter(
+            review_count__gte=min_votes
+        ).order_by('-weighted_rating')[:limit]
+
     def __str__(self):
         return self.display_name
 
@@ -69,6 +103,21 @@ class GameRating(models.Model):
     three_stars = models.IntegerField(default=0)
     two_stars = models.IntegerField(default=0)
     one_stars = models.IntegerField(default=0)
+
+    @property
+    def total_ratings(self):
+        return self.five_stars + self.four_stars + self.three_stars + self.two_stars + self.one_stars
+
+    @property
+    def average_rating(self):
+        total_score = (
+            5 * self.five_stars +
+            4 * self.four_stars +
+            3 * self.three_stars +
+            2 * self.two_stars +
+            1 * self.one_stars
+        )
+        return total_score / self.total_ratings if self.total_ratings > 0 else 0
 
     def __str__(self):
         return self.game.display_name
@@ -143,7 +192,7 @@ class GameOrder(models.Model):
     total_price = models.FloatField(default=0, validators=[
         MinValueValidator(10)
     ])
-    voucher = models.OneToOneField(GameVoucher, blank=True, null=True, on_delete=models.SET_NULL)
+    voucher = models.ForeignKey(GameVoucher, blank=True, null=True, on_delete=models.SET_NULL)
     voucher_amount = models.FloatField(default=0)
 
     STATUS_CHOICES =( 

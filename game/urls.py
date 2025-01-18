@@ -16,6 +16,9 @@ urlpatterns = [
     path('remove_build', views.remove_build, name="remove_build"),
     path('remove_genre', views.remove_genre, name="remove_genre"),
     path('remove_voucher', views.remove_voucher, name="remove_voucher"),
+    path('remove_review', views.remove_review, name="remove_review"),
 
     path('download/<slug:slug>', views.download_game, name="download_game"),
+
+    path('search', views.searchpage, name="search_product"),
 ]

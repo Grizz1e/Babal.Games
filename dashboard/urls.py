@@ -19,4 +19,5 @@ urlpatterns = [
     path('builds/add/<slug:slug>/', user_passes_test(is_admin)(views.dashboard_add_build_game), name="dashboard_add_build_game"),
     path('users/', user_passes_test(is_admin)(views.dashboard_users), name="dashboard_users"),
     path('users/manage/<int:id>', user_passes_test(is_admin)(views.dashboard_manage_user), name="dashboard_manage_user"),
+    path('reviews/', user_passes_test(is_admin)(views.dashboard_reviews), name="dashboard_reviews"),
 ]

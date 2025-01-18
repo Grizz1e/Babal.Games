@@ -3,7 +3,7 @@
 Sign in to Babal.Games | Babal.Games
 {% endblock %}
 {% block content %}
-    <section class="container flex justify-center mt-20">
+    <section class="flex justify-center mt-20 w-full">
         <div class="w-fit container">
             <div class="flex text-2xl w-[20rem] lg:w-[30rem] text-gray-400">
                 <button class="signin-page-btn hover:no-underline text-white hover:text-white w-1/2 bg-gray-700 border-r-8 border-b-8 border-gray-700 p-2">Sign In</button>
@@ -22,8 +22,8 @@ Sign in to Babal.Games | Babal.Games
                         />
                     </div>
                     <div class="password-container relative w-full px-2 my-4">
-                        <input type="password" name="password" placeholder="*******" required class="text-black bg-white rounded w-full outline-none p-2">
-                        <button type="button" class="show-pass-btn absolute top-0 bottom-0 right-4">
+                        <input type="password" name="password" placeholder="*******" required class="text-black bg-white rounded w-full outline-none p-2" id="pass-signin">
+                        <button type="button" class="show-pass-signin-btn absolute top-0 bottom-0 right-4">
                             <i class="ph-bold ph-eye-slash text-gray-400 text-2xl"></i>
                         </button>
                     </div>
@@ -117,6 +117,18 @@ Sign in to Babal.Games | Babal.Games
 {% endblock %}
 
 {% block scripts%}
+    <script type="text/javascript">
+        $('.show-pass-signin-btn').on('click', function(){
+            let input = $("#pass-signin");
+            if(input.attr('type') == 'password'){
+                input.attr('type', 'text');
+                $(this).find('i').removeClass('ph-eye-slash').addClass('ph-eye');
+            }else{
+                input.attr('type', 'password');
+                $(this).find('i').removeClass('ph-eye').addClass('ph-eye-slash');
+            }
+        })
+    </script>
     <script type="text/javascript">
         $('.show-pass-btn').on('click', function(){
             let input = $("#password");

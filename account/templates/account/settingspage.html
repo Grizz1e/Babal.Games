@@ -2,6 +2,69 @@
 {% block title %}
   {{ user.username }}'s Settings | Babal.Games
 {% endblock %}
+{% block profile_content %}
+  <div class="grid grid-cols-2 gap-4">
+    <div class="mt-4 bg-gray-800 w-full p-4 rounded">
+      <h1 class="text-primary text-3xl mb-4">Change Info</h1>
+      <div class="my-2 p-0 flex items-center justify-start gap-2">
+        <label for="username" class="text-xl min-w-40">Username</label>
+        <input type="text" disabled class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="username" placeholder="New Username" value="@{{ request.user.username }}" required />
+      </div>
+      <form class="my-2 p-0 flex items-center justify-start gap-2" method="post">
+        {% csrf_token %}
+        <label for="email" class="text-xl min-w-40">Email Address</label>
+        <input type="email" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="email" placeholder="New Email" value="{{ request.user.email }}" required />
+        <button type="submit" class="text-primary rounded border-2 border-primary font-bold px-2 py-1 hover:text-black hover:bg-primary flex gap-2 justify-center items-center"><i class="ph ph-pencil-simple edit-details"></i><span>Update</span></button>
+      </form>
+      <form class="my-2 p-0 flex items-center justify-start gap-2" method="post">
+        {% csrf_token %}
+        <label for="first_name" class="text-xl min-w-40">First Name</label>
+        <input type="text" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="first_name" placeholder="New First Name" value="{{ request.user.first_name }}" required />
+        <button type="submit" class="text-primary rounded border-2 border-primary font-bold px-2 py-1 hover:text-black hover:bg-primary flex gap-2 justify-center items-center"><i class="ph ph-pencil-simple edit-details"></i><span>Update</span></button>
+      </form>
+      <form class="my-2 p-0 flex items-center justify-start gap-2" method="post">
+        {% csrf_token %}
+        <label for="last_name" class="text-xl min-w-40">Last Name</label>
+        <input type="text" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="last_name" placeholder="New Last Name" value="{{ request.user.last_name }}" required />
+        <button type="submit" class="text-primary rounded border-2 border-primary font-bold px-2 py-1 hover:text-black hover:bg-primary flex gap-2 justify-center items-center"><i class="ph ph-pencil-simple edit-details"></i><span>Update</span></button>
+      </form>
+    </div>
+    <div class="mt-4 bg-gray-800 p-4 rounded w-full">
+      <h1 class="text-primary text-3xl mb-4">Change Password</h1>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="change_password">
+        <div class="my-2 p-0 flex items-center justify-start gap-2">
+          <label for="current_password" class="text-xl min-w-40">Current Password</label>
+          <input type="password" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="current_password" placeholder="Enter Current Password" value="" required />
+        </div>
+        <div class="my-2 p-0 flex items-center justify-start gap-2">
+          <label for="new_password" class="text-xl min-w-40">New Password</label>
+          <input type="password" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="new_password" placeholder="Enter New Password" value="" required />
+        </div>
+        <div class="my-2 p-0 flex items-center justify-start gap-2">
+          <label for="confirm_password" class="text-xl min-w-40">Confirm Password</label>
+          <input type="password" class="text-gray-300 focus:border-primary py-2 border-2 border-gray-800 rounded indent-1 outline-none bg-gray-700" name="confirm_password" placeholder="Confirm New Password" value="" required />
+        </div>
+        <button type="submit" class="hover:bg-primary px-2 py-1 text-primary hover:text-black border-2 border-primary font-bold rounded">Update Password</button>
+      </form>
+    </div>
+  </div>
+  <div class="mt-4">
+    <form class="m-0 p-0" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="delete_user" value="true">
+      <button type="submit" class="bg-red-500 px-2 py-1 text-black font-bold rounded hover:bg-red-400">Delete Account</button>
+    </form>
+  </div>
+{% endblock %}
+{% block extrascripts %}
+  <script>
+    $('.edit-details').on('click', function () {
+      $(this).closest('input').removeAttr('disabled')
+    })
+  </script>
+{% endblock %}
 {% block tab_highlight %}
   <script type="text/javascript">
     $('.settings-tab').addClass('text-white')

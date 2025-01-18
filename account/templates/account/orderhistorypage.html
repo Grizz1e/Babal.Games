@@ -5,6 +5,7 @@
 {% endblock %}
 {% block profile_content %}
   <div class="w-full mt-4">
+    {% if orders %}
     {% for order in orders %}
       <h1 class="px-4 mt-4 text-gray-400">{{ order.order_date }}</h1>
       <div class="bg-gray-800 mt-2 rounded p-4" id="{{ order.order_id }}">
@@ -82,6 +83,11 @@
         </div>
       </div>
     {% endfor %}
+    {% else %}
+    <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+      <span class="text-xl text-black"><i class="ph ph-warning"></i> No order history!</span>
+    </div>
+    {% endif %}
   </div>
 {% endblock %}
 {% block tab_highlight %}

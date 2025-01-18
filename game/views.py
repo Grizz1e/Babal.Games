@@ -1,15 +1,16 @@
 from .api import send_payment_request_to_khalti, send_verification_request_to_khalti
 from .models import Game, GameCode, GameOrder, \
-    GameVoucher, NewGameGenre, GameBuild
+    GameVoucher, NewGameGenre, GameBuild, GameReview
 from django.contrib.auth.decorators import login_required
 from core.utils import calculate_basket_price
 from django.shortcuts import redirect, render
 from core.models import Basket, Wishlist
-from django.http import JsonResponse, FileResponse, Http404
+from django.http import JsonResponse, FileResponse, Http404, HttpResponse
 from django.utils import timezone
 from django.contrib import messages
 import uuid, os
 from .utils import voucher_applicable
+from django.core import serializers
 
 # Create your views here.
 
@@ -198,13 +199,14 @@ def verify_payment(request):
         })
     res = send_verification_request_to_khalti(pidx=pidx)
     if res["status"] == "Completed" and res["refunded"] == False:
+
+        for game in order.games.all():
+            game.licensed_to.add(order.buyer)
+            game.save()
         order.is_payment_successful = True
         order.status = 2
         order.save()
-
-        for game in order.games.all():
-            game.licensed_to = order.buyer
-            game.save()
+        messages.success(request, "Thanks for making the purchase")
         return redirect('mygamespage')
     return JsonResponse({
         'success': False,
@@ -352,6 +354,26 @@ def remove_voucher(request):
     })
 
 @login_required(login_url='authpage')
+def remove_review(request):
+    if request.method == "POST" and request.user.is_staff:
+        try:
+            id = request.POST.get('id')
+            GameReview.objects.get(id=id).delete()
+        except GameReview.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Review does not exist!'
+            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Review removed!'
+        })
+    return JsonResponse({
+        'success': False,
+        'message': 'An error occurred!'
+    })
+
+@login_required(login_url='authpage')
 def download_game(request, slug):
     if request.user.is_authenticated and request.method == "POST":
         try:
@@ -387,3 +409,8 @@ def download_game(request, slug):
             'success': False,
             'message': "No permission to access the file"
         })
+    
+def searchpage(request):
+    games = Game.objects.filter(display_name__icontains=request.GET.get('q'))
+    games_json = serializers.serialize('json', games)
+    return HttpResponse(games_json, content_type='application/json')

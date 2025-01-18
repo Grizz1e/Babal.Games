@@ -9,7 +9,9 @@ from core.utils import calculate_basket_price, GameRecommendation
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
 from django.core import serializers
+from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import Case, When, Value, Q
 from game.utils import GameRecommendationService
 from markdown import markdown
 
@@ -22,7 +24,7 @@ def indexpage(request):
     if request.user.is_authenticated:
         for_you = recommentation.get_for_you_games()
         context["for_you"] = for_you
-    top_rated = recommentation.get_top_rated_games()
+    top_rated = Game.get_top_rated_games(6, 0)
 
     new_games = Game.objects.order_by('-id')[:6]
 
@@ -65,16 +67,11 @@ def gamepage(request, slug):
         game = Game.objects.get(slug=slug)
     except Game.DoesNotExist:
         return redirect('indexpage')
+    already_owned = False
     if request.user.is_authenticated:
-        user_has_ordered = GameOrder.objects.filter(
-            buyer=request.user,
-            games=game,
-            is_payment_successful=True
-        ).exists()
-    else:
-        user_has_ordered = False
+        already_owned = game.licensed_to.filter(id=request.user.id).exists()
 
-    if request.method == "POST" and user_has_ordered:
+    if request.method == "POST" and already_owned:
         review_content = request.POST.get('review_content')
         try:
             rating = int(request.POST.get('rating'))
@@ -94,8 +91,8 @@ def gamepage(request, slug):
         game_review.save()
 
          
-    recommendation = GameRecommendation(request.user)
-    you_might_also_like = recommendation.get_frequently_bought_together(game)
+    recommendation = GameRecommendationService(request.user)
+    you_might_also_like = recommendation.get_similar_games(game)
 
     screenshots = GameScreenshot.objects.filter(game=game)
     reviews = GameReview.objects.filter(game=game).order_by('-review_date')
@@ -111,9 +108,6 @@ def gamepage(request, slug):
     except GameReview.DoesNotExist:
         user_review = None
 
-    already_owned = False
-    if request.user.is_authenticated:
-        already_owned = game.licensed_to.filter(id=request.user.id).exists()
     build_available = GameBuild.objects.filter(game=game).exists()
 
     total_rating = reviews.count()
@@ -149,7 +143,6 @@ def gamepage(request, slug):
             'min': min_req,
             'rec': rec_req
         },
-        'user_purchased_game': user_has_ordered,
         'recommendation': {
             'you_might_also_like': you_might_also_like
         }
@@ -204,3 +197,21 @@ def genrepage(request, slug:str):
     context['genre'] = genre.display_name
     context['games'] = games
     return render(request, 'core/genrepage.html', context)
+
+def resultpage(request):
+    q = request.GET.get('q')
+    if not q:
+        results = []
+    else:
+        results = Game.objects.filter(display_name__icontains=request.GET.get('q'))
+        p = Paginator(results, 10)
+        page = request.GET.get('page')
+        results = p.get_page(page)
+    context = {
+        'results': results,
+        'search_query': q
+    }
+    return render(request, 'core/resultpage.html', context)
+
+    games = Game.objects.filter(display_name__icontains=request.GET.get('q'))
+    games_json = serializers.serialize('json', games)

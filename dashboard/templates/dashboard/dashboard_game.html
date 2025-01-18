@@ -275,6 +275,13 @@
                     </div>
                 </form>
             </div>
+            <form class="flex justify-end m-0 p-0" method="post">
+                {% csrf_token %}
+                <div class="flex gap-10 items-center">
+                    <input type="hidden" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="delete_game" name="delete_game" value="true">
+                    <button class="rounded bg-red-500 hover:bg-red-400 px-4 py-2 flex items-center gap-2"><i class="ph ph-trash text-2xl"></i><span>DELETE THIS GAME</span><button>
+                </div>
+            </form>
         </div>
     </div>
 {% endblock %}
