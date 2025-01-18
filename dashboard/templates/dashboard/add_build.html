@@ -1,0 +1,64 @@
+{% extends 'dashboard/base.html' %}
+{% load custom_tag %}
+{% block title %}
+  Add New Keys | Babal.Games
+{% endblock %}
+{% block links %}
+  <style>
+    label {
+      width: 10rem;
+      display: block;
+    }
+  </style>
+{% endblock %}
+{% block dashboard_content %}
+  <div class="px-10 flex items-center justify-between mb-10">
+    <div class="flex items-center gap-2">
+      <a href="{% url 'dashboard_builds' %}"><i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i></a>
+      <h1 class="text-3xl">Select The Game</h1>
+    </div>
+  </div>
+  <div class="px-2">
+    <form class="mx-0 mb-5">
+      <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a game" name="q" value="{{ request.GET.q }}" />
+      <button type="submit">Go</button>
+    </form>
+    {% for game in games %}
+    <div class="bg-gray-800 p-4 rounded mb-4 flex justify-between items-center">
+        <div class="flex items-center text-xl gap-4 text-primary">
+            <a href="{% url 'dashboard_add_build_game' game.slug%}"><img src="/media/{{ game.banner }}" class="rounded w-28 aspect-[5/3] object-cover"></a>
+            <a href="{% url 'dashboard_add_build_game' game.slug%}" class="hover:text-secondary"><p class="flex flex-col">
+              <span>{{ game.display_name}}</span>
+              <span class="text-gray-400 text-sm">{{ game.total_builds}} builds published</span></p></a>
+        </div>
+        <a href="{% url 'dashboard_add_build_game' game.slug %}" class="transition-all duration-100 hover:translate-x-2"><i class="ph-bold ph-arrow-right text-4xl text-primary"></i></a>
+    </div>
+    {% endfor %}
+    <div class="mt-5 flex items-center">
+      <div class="flex items-center justify-between">
+        <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={% if games.has_previous %}{{ games.previous_page_number }}{% else %}1{% endif %}">
+          <i class="ph ph-caret-left"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ games.number }}">{{ games.number }}</a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={% if games.has_next %}{{ games.next_page_number }}{% else %}{{ games.paginator.num_pages }}{% endif %}">
+          <i class="ph ph-caret-right"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ games.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+      </div>
+      <span class="px-2">Go to page</span>
+      <form class="items-center h-fit my-auto flex">
+        <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ games.number }}" />
+        <input type="hidden" name="q" value="{{ request.GET.q }}" />
+        <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block tab_highlight %}
+<script type="text/javascript">
+  $('.builds-tab').addClass('text-secondary')
+  $('.builds-tab').addClass('bg-gray-700')
+</script>
+{% endblock %}

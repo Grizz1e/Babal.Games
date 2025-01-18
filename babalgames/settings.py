@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'core',
     'account',
     'game',
+    'dashboard',
+
 ]
 
 MIDDLEWARE = [
@@ -127,6 +129,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+GAME_BUILDS_DIR = os.path.join(BASE_DIR, 'game_builds')
 MEDIA_URL = '/media/'
 
 # Default primary key field type

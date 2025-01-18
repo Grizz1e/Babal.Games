@@ -1,0 +1,185 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+  Admin Dashboard | Babal.Store
+{% endblock %}
+
+{% block dashboard_content %}
+  <section class="flex items-center mr-10 gap-10">
+    <div>
+      <div class="mb-5">
+        <span class="text-3xl">Top Sales</span>
+      </div>
+      <div class="h-60 flex justify-center items-center">
+        <canvas id="top-sales-chart"></canvas>
+      </div>
+    </div>
+    <div class="w-full">
+      <div class="mb-5">
+        <span class="text-3xl">Net Revenue</span>
+      </div>
+      <div class="h-60 flex items-center w-full">
+        <canvas class="w-full" id="revenueChart"></canvas>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 justify-center w-full">
+      <div class="items-center text-center">
+        <p class="flex flex-col bg-gray-700 p-8 rounded items-center text-center">
+          <span class="text-xl">Total Users</span>
+          <span class="text-3xl">{{ total_users }}</span>
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 items-center">
+        <p class="flex flex-col bg-gray-700 p-8 rounded items-center text-center">
+          <span class="text-xl">Total Apps</span>
+          <span class="text-3xl">{{ total_games }}</span>
+        </p>
+        <p class="flex flex-col bg-gray-700 p-8 rounded items-center text-center">
+          <span class="text-xl">Net Revenue</span>
+          <span class="text-3xl">{{ total_price|floatformat:'.2f' }}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="flex flex-col mr-10">
+    <div class="my-5">
+      <span class="text-3xl">Recent Changes</span>
+    </div>
+    <table class="rounded w-full">
+      <thead class="bg-gray-800">
+        <tr>
+          <th class="px-5 py-2">User</th>
+          <th class="px-5 py-2">Content Type</th>
+          <th class="px-5 py-2">Object</th>
+          <th class="px-5 py-2">Action Flag</th>
+          <th class="px-5 py-2">Timestamp</th>
+        </tr>
+      </thead>
+      <tbody class="bg-gray-700">
+        {% for entry in log_entries %}
+          <tr>
+            <td class="px-5 py-2">{{ entry.user }}</td>
+            <td class="px-5 py-2">{{ entry.content_type }}</td>
+            <td class="px-5 py-2">{{ entry.object_repr }}</td>
+            <td class="px-5 py-2 items-center">
+              {% if entry.action_flag == 1 %}
+                <i class="ph ph-plus"></i>
+              {% elif entry.action_flag == 2 %}
+                <i class="ph ph-pencil-simple"></i>
+              {% elif entry.action_flag == 3 %}
+                <i class="ph ph-trash-simple"></i>
+              {% endif %}
+            </td>
+            <td class="px-5 py-2">{{ entry.action_time }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="mt-5 flex items-center">
+      <div class="flex items-center justify-between">
+        <a class="px-2" href="?page=1"><i class="ph ph-caret-double-left"></i></a>
+        <a class="px-2"
+          href="?page={% if log_entries.has_previous %}
+            {{ log_entries.previous_page_number }}
+          {% else %}
+            
+            
+            1
+
+
+          {% endif %}">
+          <i class="ph ph-caret-left"></i>
+        </a>
+        <a class="px-2" href="?page={{ log_entries.number }}">{{ log_entries.number }}</a>
+        <a class="px-2"
+          href="?page={% if log_entries.has_next %}
+            {{ log_entries.next_page_number }}
+          {% else %}
+            {{ log_entries.paginator.num_pages }}
+          {% endif %}">
+          <i class="ph ph-caret-right"></i>
+        </a>
+        <a class="px-2" href="?page={{ log_entries.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+        <span class="px-2">Go to page</span>
+        <form class="items-center h-fit my-auto flex">
+          <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ log_entries.number }}" /><button class="mx-2 bg-gray-800 hover:bg-gray-700 outline-none border-none px-2 rounded" type="submit">Go</button>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const ctx = document.getElementById('top-sales-chart');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ top_sales.games|safe }},
+            datasets: [{
+                label: 'Total Sold',
+                data: {{ top_sales.user_count }},
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    var ctx2 = document.getElementById('revenueChart');
+    new Chart(ctx2, {
+        type: 'line',  // Line chart
+        data: {
+            labels: {{ last_week.labels|safe }},
+            datasets: [{
+                label: 'Revenue Earned',
+                data: {{ last_week.revenue|safe }},
+                fill: false,
+                borderColor: '#6366f1',
+                tension: 0.1
+            }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Net Revenue per week'
+            },
+            legend: {
+              display: false
+          }
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Per Day'
+              }
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Revenue'
+              }
+            }
+          }
+        },
+    });
+</script>
+  {% block tab_highlight %}
+    <script type="text/javascript">
+    $('.overview-tab').addClass('text-secondary')
+    $('.overview-tab').addClass('bg-gray-700')
+</script>
+  {% endblock %}
+{% endblock %}

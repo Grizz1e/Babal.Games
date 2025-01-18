@@ -1,12 +1,16 @@
 from .api import send_payment_request_to_khalti, send_verification_request_to_khalti
-from .models import Game, GameCode, GameOrder, GameVoucher
+from .models import Game, GameCode, GameOrder, \
+    GameVoucher, NewGameGenre, GameBuild, GameReview
 from django.contrib.auth.decorators import login_required
 from core.utils import calculate_basket_price
 from django.shortcuts import redirect, render
 from core.models import Basket, Wishlist
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404, HttpResponse
 from django.utils import timezone
-import uuid
+from django.contrib import messages
+import uuid, os
+from .utils import voucher_applicable
+from django.core import serializers
 
 # Create your views here.
 
@@ -15,6 +19,12 @@ def add_to_basket(request, product_id):
     user = request.user
     if request.method == "POST":
         game = Game.objects.get(id=product_id)
+        if not GameBuild.objects.filter(game=game).exists():
+            messages.error(request, "Product Out of Stock")
+            return redirect('gamepage', game.slug)
+        elif game.licensed_to.filter(id=request.user.id).exists():
+            messages.error(request, "You already own this product")
+            return redirect('gamepage', game.slug)
         basket, created = Basket.objects.get_or_create(buyer=user)
         basket.games.add(game)
         basket.save()
@@ -86,6 +96,12 @@ def wishlist_to_basket(request, product_id):
             game = Game.objects.get(id=product_id)
         except Game.DoesNotExist:
             return redirect('wishlistpage')
+        if not GameBuild.objects.filter(game=game).exists():
+            messages.error(request, "Product Out of Stock")
+            return redirect('gamepage', game.slug)
+        elif game.licensed_to.filter(id=request.user.id).exists():
+            messages.error(request, "You already own this product")
+            return redirect('gamepage', game.slug)
         wishlist = Wishlist.objects.get(buyer=request.user)
         basket = Basket.objects.get(buyer=request.user)
         wishlist.games.remove(game)
@@ -99,38 +115,53 @@ def create_order(request):
     if request.method == "POST":
         user = request.user
         voucher_code = request.POST.get('voucher-code')
+        print(voucher_code)
+        voucher_applied = False
         if voucher_code != "":
             try:
                 voucher = GameVoucher.objects.get(voucher_code=voucher_code.upper())
+                voucher_applied = True
             except GameVoucher.DoesNotExist:
-                pass
+                return redirect('basketpage')
             if request.user in voucher.used_by.all():
-                pass
-            else:
-                voucher.used_by.add(user)
-                voucher.save()
+                return redirect('basketpage')
         user_basket = Basket.objects.get(buyer=user)
         # check if the user has any games in the basket
         if user_basket.games.count() == 0:
             return redirect('basketpage')
         total_price = 0
-        order = GameOrder.objects.create(buyer=user)
+        order = GameOrder.objects.create(buyer=user, status=1)
         for game in user_basket.games.all():
             order.games.add(game)
             total_price += (game.price - game.discount_amount)
         order.total_price = total_price
+        if voucher_applied:
+            if voucher_applicable(voucher, order, request):
+                voucher.used_by.add(user)
+                voucher.save()
+                order.voucher = voucher
+                discount_amount = 0
+                if voucher.voucher_type == "amount":
+                    discount_amount = voucher.max_discount_amount
+                else:
+                    discount_amount = (total_price * voucher.percentage_discount) / 100
+                    if discount_amount > voucher.max_discount_amount:
+                        discount_amount = voucher.max_discount_amount
+                total_price -= discount_amount
+                order.voucher_amount = discount_amount
         order.save()
         user_basket.games.clear()
         user_basket.save()
-        return redirect('initiate_payment', int(total_price) * 100, str(order.order_id))
+        print(total_price)
+        return redirect('initiate_payment', float(total_price) * 100, str(order.order_id))
 
 @login_required(login_url='authpage')
 def initiate_payment(request, total_price, order_id):
-    total_price = int(total_price)
+    total_price = float(total_price)
     res = send_payment_request_to_khalti(
         amount={
-            "base_amount": int(total_price - (total_price * 0.13)),
-            "vat_amount": int((total_price * 0.13))
+            "base_amount": float(total_price - (total_price * 0.13)),
+            "vat_amount": float(total_price * 0.13)
         },
         order_id=order_id,
         order_name="Babal.Games Purchase",
@@ -168,19 +199,15 @@ def verify_payment(request):
         })
     res = send_verification_request_to_khalti(pidx=pidx)
     if res["status"] == "Completed" and res["refunded"] == False:
-        order.is_payment_successful = True
-        order.save()
 
         for game in order.games.all():
-            game.copies_sold += 1
+            game.licensed_to.add(order.buyer)
             game.save()
-            game_code = GameCode.objects.filter(game=game, is_sold=False).first()
-            game_code.is_sold = True
-            game_code.sold_to = order.buyer
-            game_code.date_sold = timezone.now()
-            game_code.associated_order_id = order.order_id
-            game_code.save()
-        return redirect('mykeyspage')
+        order.is_payment_successful = True
+        order.status = 2
+        order.save()
+        messages.success(request, "Thanks for making the purchase")
+        return redirect('mygamespage')
     return JsonResponse({
         'success': False,
         'message': 'Payment not verified!'
@@ -241,3 +268,149 @@ def remove_from_basket(request):
             'basket': calculate_basket_price(basket, {}),
             'message': 'Game removed from the basket!'
         })
+    
+def get_base_info(request):
+    genres = NewGameGenre.objects.all().order_by('-display_name').values()
+    if request.user.is_authenticated:
+        wishlist_count = Wishlist.objects.get(buyer=request.user).games.count()
+        basket = Basket.objects.get(buyer=request.user)
+        basket_count = basket.games.count()
+        basket_value = 0
+        for game in basket.games.all():
+            basket_value += (game.price - game.discount_amount)
+    else:
+        wishlist_count = 0
+        basket_count = 0
+        basket_value = 0.00
+    context = {}
+    context['genres'] = list(genres)
+    context['wishlist'] = {
+        'count': wishlist_count
+    }
+    context['basket'] = {
+        'count': basket_count,
+        'value': basket_value
+    }
+    return JsonResponse(context, safe=False)
+
+@login_required(login_url='authpage')
+def remove_build(request):
+    if request.method == "POST" and request.user.is_staff:
+        try:
+            id = request.POST.get('id')
+            GameBuild.objects.get(id=id).delete()
+        except GameBuild.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'An error occurred!'
+            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Build removed!'
+        })
+    return JsonResponse({
+        'success': False,
+        'message': 'An error occurred!'
+    })
+
+@login_required(login_url='authpage')
+def remove_genre(request):
+    if request.method == "POST" and request.user.is_staff:
+        try:
+            slug = request.POST.get('slug')
+            NewGameGenre.objects.get(slug=slug).delete()
+        except NewGameGenre.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'An error occurred!'
+            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Genre removed!'
+        })
+    return JsonResponse({
+        'success': False,
+        'message': 'An error occurred!'
+    })
+
+@login_required(login_url='authpage')
+def remove_voucher(request):
+    if request.method == "POST" and request.user.is_staff:
+        try:
+            id = request.POST.get('id')
+            GameVoucher.objects.get(id=id).delete()
+        except GameVoucher.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Voucher does not exist!'
+            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Voucher removed!'
+        })
+    return JsonResponse({
+        'success': False,
+        'message': 'An error occurred!'
+    })
+
+@login_required(login_url='authpage')
+def remove_review(request):
+    if request.method == "POST" and request.user.is_staff:
+        try:
+            id = request.POST.get('id')
+            GameReview.objects.get(id=id).delete()
+        except GameReview.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Review does not exist!'
+            })
+        return JsonResponse({
+            'success': True,
+            'message': 'Review removed!'
+        })
+    return JsonResponse({
+        'success': False,
+        'message': 'An error occurred!'
+    })
+
+@login_required(login_url='authpage')
+def download_game(request, slug):
+    if request.user.is_authenticated and request.method == "POST":
+        try:
+            try:
+                game = Game.objects.get(slug=slug)
+            except Game.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'message': "File does not exist"
+                })
+            game_build = GameBuild.objects.filter(game=game).order_by('-date_added').first()
+        except GameBuild.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': "File does not exist"
+            })
+        if game.licensed_to.filter(id=request.user.id).exists():
+            file_path = game_build.zip_file.path
+            if not os.path.exists(file_path):
+                raise Http404("File not found")
+        
+            response = FileResponse(
+                open(file_path, 'rb'),
+                as_attachment=True,
+                filename=f"{game_build.game.slug}_build_{game_build.id}"
+            )
+            
+            response['Content-Type'] = 'application/zip'
+            
+            return response
+    else:
+        return JsonResponse({
+            'success': False,
+            'message': "No permission to access the file"
+        })
+    
+def searchpage(request):
+    games = Game.objects.filter(display_name__icontains=request.GET.get('q'))
+    games_json = serializers.serialize('json', games)
+    return HttpResponse(games_json, content_type='application/json')

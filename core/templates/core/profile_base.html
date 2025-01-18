@@ -1,126 +1,124 @@
 {% extends 'core/base.html' %}
 {% block content %}
-    <section class="container">
-        <div class="mx-auto max-w-7xl px-8 py-2">
-            <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
-                {% comment %} <div class="container">
-                    <h2 class="text-2xl mt-6 mb-4 ml-10">My Profile</h2>
-                </div> {% endcomment %}
-                <div class="container flex justify-center object-center bg-no-repeat bg-cover bg-center rounded mt-6" style="background: url('https://source.unsplash.com/1920x512/?Gaming'); background-attachment: fixed;">
-                    <div class="flex flex-col items-center backdrop-brightness-50 w-full py-8">
-                        <div class="w-28 h-28 bg-white rounded-full relative flex justify-center items-center gap-2 text-4xl">
-                            <i class="caret hidden ph-bold ph-caret-left"></i>
-                            <img src="/media/avatar/{{user_profile.avatar_id}}.jpg" loading="lazy" class="avatar-img rounded-full object-cover">
-                            <div class="border-4 border-primary group w-full h-full absolute hover:bg-gradient-to-t hover:from-black top-0 rounded-full flex justify-center items-center">
-                                <i class="group-hover:inline hidden ph-bold ph-swap text-4xl"></i>
-                                <form method="post" action="" class="change-avatar-form flex justify-center items-center h-fit w-fit m-0">
-                                    {% csrf_token %}
-                                    <button type="submit">
-                                        <i class="hidden ph-bold ph-check text-4xl"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            <i class="caret hidden ph-bold ph-caret-right"></i>
-                        </div>
-                        <p class="font-semibold  text-lg mt-2">{{user.username}}</p>
-                        <a href="{% url 'signout_user' %}" class="hover:underline text-gray-400">Sign off</a>
-                    </div>
-                </div>
-                <div class="container mt-6">
-                    <ul class="flex gap-10 bg-gray-800 w-full justify-between p-4 text-sm lg:text-2xl text-gray-400 rounded overflow-x-scroll lg:overflow-visible">
-                        <li class="overview-tab hover:text-white">
-                            <a href="{% url 'profilepage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="overview-tab-icon group-hover:text-secondary ph-bold ph-newspaper-clipping"></i>
-                                <span class="">Overview</span>
-                            </a>
-                        </li>
-                        <li class="order-history-tab hover:text-white">
-                            <a href="{% url 'orderhistorypage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="order-history-tab-icon group-hover:text-secondary ph-bold ph-clock-counter-clockwise"></i>
-                                <span class="">Order History</span>
-                            </a>
-                        </li>
-                        <li class="wishlist-tab hover:text-white">
-                            <a href="{% url 'wishlistpage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="wishlist-tab-icon group-hover:text-secondary ph-fill ph-heart-straight"></i>
-                                <span class="">Wishlist</span>
-                            </a>
-                        </li>
-                        <li class="my-keys-tab hover:text-white">
-                            <a href="{% url 'mykeyspage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="my-keys-tab-icon group-hover:text-secondary ph-bold ph-key"></i>
-                                <span class="">My Keys</span>
-                            </a>
-                        </li>
-                        <li class="my-reviews-tab hover:text-white">
-                            <a href="{% url 'myreviewspage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="my-reviews-tab-icon group-hover:text-secondary ph-fill ph-chat-centered"></i>
-                                <span class="">My Reviews</span>
-                            </a>
-                        </li>
-                        <li class="settings-tab hover:text-white">
-                            <a href="{% url 'settingspage' %}" class="group flex flex-col justify-center items-center">
-                                <i class="settings-tab-icon group-hover:text-secondary ph-fill ph-gear-six"></i>
-                                <span class="">Settings</span>
-                            </a>
-                        </li>
-                    </ul>
-                    {% block profile_content %}{% endblock %}
-                </div>
-            </div>
+  <div class="mx-auto max-w-7xl px-8 py-2">
+    {% comment %} <div class="container">
+      <h2 class="text-2xl mt-6 mb-4 ml-10">My Profile</h2>
+    </div> {% endcomment %}
+    <div class="container flex justify-center object-center bg-no-repeat bg-cover bg-center rounded mt-6" style="background: url('https://source.unsplash.com/1920x512/?Gaming'); background-attachment: fixed;">
+      <div class="flex flex-col items-center backdrop-brightness-50 w-full py-8">
+        <div class="w-28 h-28 bg-white rounded-full relative flex justify-center items-center gap-2 text-4xl">
+          <i class="caret hidden ph-bold ph-caret-left"></i>
+          <img src="/media/avatar/{{ user_profile.avatar_id }}.jpg" loading="lazy" class="avatar-img rounded-full object-cover" />
+          <div class="border-4 border-primary group w-full h-full absolute hover:bg-gradient-to-t hover:from-black top-0 rounded-full flex justify-center items-center">
+            <i class="group-hover:inline hidden ph-bold ph-swap text-4xl"></i>
+            <form method="post" action="" class="change-avatar-form flex justify-center items-center h-fit w-fit m-0">
+              {% csrf_token %}
+              <button type="submit"><i class="hidden ph-bold ph-check text-4xl"></i></button>
+            </form>
+          </div>
+          <i class="caret hidden ph-bold ph-caret-right"></i>
         </div>
-    </section>
+        <p class="font-semibold text-lg mt-2">{{ user.username }}</p>
+        <a href="{% url 'signout_user' %}" class="hover:underline text-gray-400">Sign off</a>
+      </div>
+    </div>
+    <div class="container mt-6">
+      <ul class="flex gap-10 bg-gray-800 w-full justify-between p-4 text-sm lg:text-2xl text-gray-400 rounded overflow-x-scroll lg:overflow-visible">
+        <li class="overview-tab hover:text-white">
+          <a href="{% url 'profilepage' %}" class="group flex flex-col justify-center items-center">
+            <i class="overview-tab-icon group-hover:text-secondary ph-bold ph-newspaper-clipping"></i>
+            <span class="">Overview</span>
+          </a>
+        </li>
+        <li class="order-history-tab hover:text-white">
+          <a href="{% url 'orderhistorypage' %}" class="group flex flex-col justify-center items-center">
+            <i class="order-history-tab-icon group-hover:text-secondary ph-bold ph-clock-counter-clockwise"></i>
+            <span class="">Order History</span>
+          </a>
+        </li>
+        <li class="wishlist-tab hover:text-white">
+          <a href="{% url 'wishlistpage' %}" class="group flex flex-col justify-center items-center">
+            <i class="wishlist-tab-icon group-hover:text-secondary ph-fill ph-heart-straight"></i>
+            <span class="">Wishlist</span>
+          </a>
+        </li>
+        <li class="my-keys-tab hover:text-white">
+          <a href="{% url 'mygamespage' %}" class="group flex flex-col justify-center items-center">
+            <i class="my-keys-tab-icon group-hover:text-secondary ph-fill ph-game-controller"></i>
+            <span class="">My Games</span>
+          </a>
+        </li>
+        <li class="my-reviews-tab hover:text-white">
+          <a href="{% url 'myreviewspage' %}" class="group flex flex-col justify-center items-center">
+            <i class="my-reviews-tab-icon group-hover:text-secondary ph-fill ph-chat-centered"></i>
+            <span class="">My Reviews</span>
+          </a>
+        </li>
+        <li class="settings-tab hover:text-white">
+          <a href="{% url 'settingspage' %}" class="group flex flex-col justify-center items-center">
+            <i class="settings-tab-icon group-hover:text-secondary ph-fill ph-gear-six"></i>
+            <span class="">Settings</span>
+          </a>
+        </li>
+      </ul>
+      {% block profile_content %}
+      {% endblock %}
+    </div>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        $('.ph-swap').on('click', function() {
-            $(this).toggleClass('group-hover:inline')
-            $('.ph-check').toggleClass('group-hover:inline')
-            $('.caret').toggleClass('hidden')
-        })
-        $('.ph-check').on('click', function() {
-            $(this).toggleClass('group-hover:inline')
-            $('.ph-swap').toggleClass('group-hover:inline')
-            $('.caret').toggleClass('hidden')
-        })
-    </script>
+  <script type="text/javascript">
+    $('.ph-swap').on('click', function () {
+      $(this).toggleClass('group-hover:inline')
+      $('.ph-check').toggleClass('group-hover:inline')
+      $('.caret').toggleClass('hidden')
+    })
+    $('.ph-check').on('click', function () {
+      $(this).toggleClass('group-hover:inline')
+      $('.ph-swap').toggleClass('group-hover:inline')
+      $('.caret').toggleClass('hidden')
+    })
+  </script>
 
-    <script type="text/javascript">
-        let initialCount = Number('{{user_profile.avatar_id}}')
-        $('.ph-caret-right').on('click', function() {
-            if (initialCount == Number("{{total_avatar_count}}")) initialCount = 1
-             else initialCount++
-            $('.avatar-img').attr('src', `/media/avatar/${initialCount}.jpg`)
-        })
-        $('.ph-caret-left').on('click', function() {
-            if (initialCount == 1) initialCount = Number("{{total_avatar_count}}")
-            else initialCount--
-            $('.avatar-img').attr('src', `/media/avatar/${initialCount}.jpg`)
-        })
-    </script>
+  <script type="text/javascript">
+    let initialCount = Number('{{user_profile.avatar_id}}')
+    $('.ph-caret-right').on('click', function () {
+      if (initialCount == Number('{{total_avatar_count}}')) initialCount = 1
+      else initialCount++
+      $('.avatar-img').attr('src', `/media/avatar/${initialCount}.jpg`)
+    })
+    $('.ph-caret-left').on('click', function () {
+      if (initialCount == 1) initialCount = Number('{{total_avatar_count}}')
+      else initialCount--
+      $('.avatar-img').attr('src', `/media/avatar/${initialCount}.jpg`)
+    })
+  </script>
 
+  <script type="text/javascript">
+    $('.change-avatar-form').on('submit', function (e) {
+      e.preventDefault()
+      let avatar_id = initialCount
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'change_avatar' %}",
+        data: {
+          avatar_id: avatar_id,
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function () {
+          return true
+        }
+      })
+    })
+  </script>
+  {% block tab_highlight %}
     <script type="text/javascript">
-        $('.change-avatar-form').on('submit', function(e) {
-            e.preventDefault()
-            let avatar_id = initialCount
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'change_avatar' %}",
-                data: {
-                    'avatar_id': avatar_id,
-                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-                },
-                success: function() {
-                    return true
-                }
-            })
-        })
+      $('.overview-tab').addClass('text-white')
+      $('.overview-tab-icon').addClass('text-secondary')
     </script>
-    {% block tab_highlight %}
-    <script type="text/javascript">
-        $('.overview-tab').addClass('text-white')
-        $('.overview-tab-icon').addClass('text-secondary')
-    </script>
-    {% endblock %}
+  {% endblock %}
+  {% block extrascripts %}
+
+  {% endblock %}
 {% endblock %}

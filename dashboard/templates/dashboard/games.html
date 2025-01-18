@@ -1,0 +1,84 @@
+{% extends 'dashboard/base.html' %}
+{% load custom_tag %}
+{% block title %}
+  Games Dashboard | Babal.Games
+{% endblock %}
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.games-tab').addClass('text-secondary')
+    $('.games-tab').addClass('bg-gray-700')
+  </script>
+{% endblock %}
+
+{% block dashboard_content %}
+  <div class="h-full pt-4">
+    <div class="px-4 flex items-center justify-between mr-24 mb-4">
+      <form class="m-0">
+        <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a game" name="q" value="{{ request.GET.q }}" />
+        <button type="submit">Go</button>
+      </form>
+      <a href="{% url 'dashboard_add_game' %}?referer=dashboard_games&page={{ request.GET.page }}&q={{ request.GET.q }}" class="hover:bg-primary text-primary hover:text-black border-2 border-primary px-2 rounded">Add a new product</a>
+    </div>
+    <div class="px-5 w-full">
+      <div class="grid grid-cols-3 w-full">
+        {% for game in games %}
+          <div class="container w-[22rem] overflow-hidden bg-gray-800 rounded mb-5">
+            <div class="image overflow-hidden relative group">
+              <img src="/media/{{ game.banner }}" alt="" loading="lazy" class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
+                <div class="container h-full relative flex flex-col justify-center items-center">
+                  <a href="/game/{{ game.slug }}" class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">{{ game.display_name }}</a>
+                  <a href="{% url 'dashboard_game_page' game.id %}?referer=dashboard_games&page={{ request.GET.page }}&q={{ request.GET.q }}" class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm text-center">Edit This Game</a>
+                </div>
+              </div>
+            </div>
+            <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
+              <div class="platform flex items-center gap-1 text-xl">
+                {% if game.is_available_on_windows %}
+                  <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_mac %}
+                  <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_linux %}
+                  <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+              </div>
+              <div class="pricing flex items-center gap-2 leading-4">
+                {% if game.discount_amount != 0 %}
+                  <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+                {% endif %}
+                <div class="flex flex-col text-right">
+                  {% if game.discount_amount != 0 %}
+                    <h2 class="line-through text-[0.8rem]">Rs. {{ game.price }}</h2>
+                  {% endif %}
+                  <h2 class="text-primary font-bold">Rs. {{ game.price|subtract:game.discount_amount }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="mt-5 flex items-center">
+        <div class="flex items-center justify-between">
+          <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={% if games.has_previous %}{{ games.previous_page_number }}{% else %}1{% endif %}">
+            <i class="ph ph-caret-left"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ games.number }}">{{ games.number }}</a>
+          <a class="px-2"
+            href="?q={{ request.GET.q }}&page={% if games.has_next %}{{ games.next_page_number }}{% else %}{{ games.paginator.num_pages }}{% endif %}">
+            <i class="ph ph-caret-right"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ games.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+        </div>
+        <span class="px-2">Go to page</span>
+        <form class="items-center h-fit my-auto flex">
+          <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ games.number }}" />
+          <input type="hidden" name="q" value="{{ request.GET.q }}" />
+          <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

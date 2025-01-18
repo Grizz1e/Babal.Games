@@ -1,0 +1,93 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+  Vouchers Dashboard | Babal.Store
+{% endblock %}
+{% block dashboard_content %}
+  <section class="container">
+    <div class="filterbox flex justify-between items-center mb-4">
+      <form class="m-0">
+        <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a voucher" name="q" value="{{ request.GET.q }}" />
+        <button type="submit">Go</button>
+      </form>
+      <a href="{% url 'dashboard_add_voucher' %}" class="border-2 border-primary text-primary font-bold hover:text-black hover:bg-primary px-2 py-1 rounded">Add new voucher</a>
+    </div>
+    <div class="w-full flex gap-2">
+      {% for voucher in vouchers %}
+        <div id="voucher-{{ voucher.id }}" class="p-2 mb-2 rounded-xl flex justify-between items-center h-32 relative group">
+          <div class="flex flex-col items-center justify-center font-bold w-40 h-full rounded-xl bg-gray-800 border-4 border-primary border-r-0">
+            {% if voucher.voucher_type == 'amount' %}
+              <p class="text-white">
+                Rs. <span class="text-2xl">{{ voucher.max_discount_amount }}</span>
+              </p>
+            {% elif voucher.voucher_type == 'percentage' %}
+              <p>
+                <span class="text-2xl">{{ voucher.percentage_discount }}</span>% OFF
+              </p>
+              <p class="text-xs text-gray-300">Upto Rs. {{ voucher.max_discount_amount }}</p>
+            {% endif %}
+            <p class="text-xs text-gray-300">Min. Spend Rs. {{ voucher.minimum_spend }}</p>
+            <i></i>
+          </div>
+          <div class="flex items-center justify-center font-black text-primary text-2xl h-full rounded-xl bg-gray-800 min-w-60 border-4 border-primary border-l-0">
+            <p>{{ voucher.voucher_code }}</p>
+          </div>
+          <i class="hidden ph-bold ph-trash text-2xl text-red-500 hover:text-red-400 absolute right-0 mr-5 group-hover:block cursor-pointer" onclick="removeVoucher('{{voucher.id}}')"></i>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-5 flex items-center">
+      <div class="flex items-center justify-between">
+        <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+        <a class="px-2"
+          href="?q={{ request.GET.q }}&page={% if vouchers.has_previous %}
+            {{ vouchers.previous_page_number }}
+          {% else %}
+            
+            1
+
+          {% endif %}">
+          <i class="ph ph-caret-left"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ vouchers.number }}">{{ vouchers.number }}</a>
+        <a class="px-2"
+          href="?q={{ request.GET.q }}&page={% if vouchers.has_next %}
+            {{ vouchers.next_page_number }}
+          {% else %}
+            {{ vouchers.paginator.num_pages }}
+          {% endif %}">
+          <i class="ph ph-caret-right"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ vouchers.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+      </div>
+      <span class="px-2">Go to page</span>
+      <form class="items-center h-fit my-auto flex">
+        <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ vouchers.number }}" />
+        <input type="hidden" name="q" value="{{ request.GET.q }}" />
+        <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script type="text/javascript">
+    function removeVoucher(id) {
+      $.ajax({
+        url: "{% url 'remove_voucher' %}",
+        type: 'POST',
+        data: {
+          id: id,
+          csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function (res) {
+          $(`#voucher-${id}`).remove()
+        }
+      })
+    }
+  </script>
+  {% block tab_highlight %}
+    <script type="text/javascript">
+      $('.vouchers-tab').addClass('text-secondary')
+      $('.vouchers-tab').addClass('bg-gray-700')
+    </script>
+  {% endblock %}
+{% endblock %}

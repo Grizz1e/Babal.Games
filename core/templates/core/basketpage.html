@@ -2,124 +2,118 @@
 {% load static %}
 {% load custom_tag %}
 
-{% block title %}{{user.username}}'s Basket | Babal.Games{% endblock %}
+{% block title %}
+  {{ user.username }}'s Basket | Babal.Games
+{% endblock %}
 {% block content %}
-    <section class="container">
-        <div class="mx-auto max-w-7xl px-8 py-2">
-            <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
-                <div class="container">
-                    <h2 class="text-2xl mt-6 mb-4 ml-10">Your Basket</h2>
+  <div class="mx-auto max-w-7xl px-8 py-2">
+    <div class="container">
+      <h2 class="text-2xl mt-6 mb-4">Your Basket</h2>
+    </div>
+    {% if user_basket.count < 1 %}
+      <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+        <span class="text-xl text-black"><i class="ph ph-warning"></i> Your basket is empty!</span>
+      </div>
+      {% comment %} <a href="{% url 'indexpage' %}" class="text-xl text-blue-200 hover:underline">Add games</a> {% endcomment %}
+    {% else %}
+      <div class="container flex flex-col lg:flex-row gap-4">
+        <div class="container">
+          {% for game in user_basket %}
+            <div class="basket-item-{{ game.slug }} flex flex-col justify-center items-center my-4 bg-gray-800 p-4 rounded-sm">
+              <div class="flex flex-row justify-between items-center w-full">
+                <div class="flex justify-center items-center">
+                  <img src="/media/{{ game.banner }}" loading="lazy" alt="{{ game.display_name }}" width="100px" height="50px" class="aspect-2 object-cover object-center" />
+                  <div class="ml-4">
+                    <a href="{% url 'gamepage' game.slug %}" class="text-lg text-gray-300 hover:text-primary">{{ game.display_name }}</a>
+                  </div>
                 </div>
-                {% if user_basket.count < 1 %}
-                <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
-                    <span class="text-xl text-black"><i class="ph ph-warning"></i> Your basket is empty!</span>
-                </div>
-                    {% comment %} <a href="{% url 'indexpage' %}" class="text-xl text-blue-200 hover:underline">Add games</a> {% endcomment %}
-                {% else %}
-                <div class="container flex flex-col lg:flex-row gap-4">
-                    <div class="container">
-                        {% for game in user_basket %}
-                        <div class="basket-item-{{game.slug}} flex flex-col justify-center items-center my-4 bg-gray-800 p-4 rounded-sm">
-                            <div class="flex flex-row justify-between items-center w-full">
-                                <div class="flex justify-center items-center">
-                                    <img src="/media/{{game.banner}}" loading="lazy" alt="{{game.display_name}}" width="100px" height="50px" class="aspect-2 object-cover object-center">
-                                    <div class="ml-4">
-                                        <a href="{% url 'gamepage' game.slug %}" class="text-lg text-gray-300 hover:text-primary">{{game.display_name}}</a>
-                                    </div>
-                                </div>
-                                <div class="flex justify-center items-center gap-5">
-                                    <div class="pricing flex items-center gap-4 leading-4">
-                                        {% if game.discount_amount != 0 %}
-                                        <a class="bg-gray-700 p-2">-{{ game.discount_amount |percent_round:game.price }}%</a>
-                                        {% endif %}
-                                        <div class="flex flex-col text-right w-24">
-                                            {% if game.discount_amount != 0 %}
-                                            <h2 class="line-through text-[0.8rem]">Rs. {{game.price}}</h2>
-                                            {% endif %}
-                                            <h2 class="text-primary font-bold">Rs. {{ game.price |subtract:game.discount_amount }}
-                                            </h2>
-                                        </div>
-                                    </div>
-                                    <button onclick='removeBasketItem("{{game.slug}}");'>
-                                        <i class="ph ph-trash-simple text-gray-400 hover:text-red-400 text-xl"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                <div class="flex justify-center items-center gap-5">
+                  <div class="pricing flex items-center gap-4 leading-4">
+                    {% if game.discount_amount != 0 %}
+                      <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+                    {% endif %}
+                    <div class="flex flex-col text-right w-24">
+                      {% if game.discount_amount != 0 %}
+                        <h2 class="line-through text-[0.8rem]">Rs. {{ game.price }}</h2>
+                      {% endif %}
+                      <h2 class="text-primary font-bold">Rs. {{ game.price|subtract:game.discount_amount }}</h2>
                     </div>
-                    <div class="cart-info lg:w-1/4 flex flex-col items-center min-w-96 my-4 bg-gray-800">
-                        <div class="w-full flex flex-col items-center justify-center">
-                            <p class="uppercase w-full bg-gray-700 text-center text-lg py-2 h-fit">Basket Summary</p>
-                            <div class="flex justify-between items-center p-2 w-full text-white">
-                                <p class="text-lg">Full Price</p><p id="full-price">Rs. {{full_price}}</p>
-                            </div>
-                            <div class="flex justify-between items-center p-2 w-full text-gray-300">
-                                <p class="text-lg">Discount</p><p id="discount">-Rs. {{discount}}</p>
-                            </div>
-                            <div id="voucher-container" class="hidden justify-between items-center p-2 w-full text-gray-300">
-                                <p class="text-lg">Voucher</p><p id="voucher-amount"></p>
-                            </div>
-                            <div class="flex justify-center items-center py-2 w-full text-white">
-                                <input type="text" id="voucher-code-field" class="outline-none uppercase w-11/12 p-2 bg-gray-700 text-white placeholder:normal-case" placeholder="Voucher code">
-                            </div>
-                            <hr class="w-11/12">
-                            <div class="flex justify-between items-center p-2 w-full text-primary">
-                                <p class="text-lg">You Save</p><p id="total-discount">-Rs. {{discount}}</p>
-                            </div>
-                            <hr class="w-11/12">
-                            <div class="flex justify-between items-center p-2 w-full text-white">
-                                <p class="text-lg">Total</p><p id="final-price" class="font-bold text-primary">Rs. {{final_price}}</p>
-                            </div>
-                        </div>
-                        <form action="{% url 'create_order' %}" method="post" class="flex justify-center w-full">
-                            {% csrf_token %}
-                            {% if final_price < 10 %}
-                            <button type="button" disabled class="w-11/12 p-2 bg-purple-600 cursor-not-allowed rounded-sm">
-                                Pay with Khalti
-                            </button>
-                            {% else %}
-                            <input type="hidden" name="voucher-code" value="" id="voucher-code-hidden">
-                            <button type="submit" class="w-11/12 p-2 bg-purple-600 hover:bg-purple-500 rounded-sm">
-                                Pay with Khalti
-                            </button>
-                            {% endif %}
-                        </form>
-                        <button type="button" disabled class="w-11/12 p-2 bg-lime-600 cursor-not-allowed rounded-sm">
-                            Pay with eSewa
-                        </button>
-                    </div>
+                  </div>
+                  <button onclick="removeBasketItem('{{ game.slug }}');"><i class="ph ph-trash-simple text-gray-400 hover:text-red-400 text-xl"></i></button>
                 </div>
-                {% endif %}
+              </div>
             </div>
-    </section>
-
+          {% endfor %}
+        </div>
+        <div class="cart-info lg:w-1/4 flex flex-col items-center min-w-96 my-4 bg-gray-800">
+          <div class="w-full flex flex-col items-center justify-center">
+            <p class="uppercase w-full bg-gray-700 text-center text-lg py-2 h-fit">Basket Summary</p>
+            <div class="flex justify-between items-center p-2 w-full text-white">
+              <p class="text-lg">Full Price</p>
+              <p id="full-price">Rs. {{ full_price }}</p>
+            </div>
+            <div class="flex justify-between items-center p-2 w-full text-gray-300">
+              <p class="text-lg">Discount</p>
+              <p id="discount">-Rs. {{ discount }}</p>
+            </div>
+            <div id="voucher-container" class="hidden justify-between items-center p-2 w-full text-gray-300">
+              <p class="text-lg">Voucher</p>
+              <p id="voucher-amount"></p>
+            </div>
+            <div class="flex justify-center items-center py-2 w-full text-white">
+              <input type="text" id="voucher-code-field" class="outline-none uppercase w-11/12 p-2 bg-gray-700 text-white placeholder:normal-case" placeholder="Voucher code" />
+            </div>
+            <hr class="w-11/12" />
+            <div class="flex justify-between items-center p-2 w-full text-primary">
+              <p class="text-lg">You Save</p>
+              <p id="total-discount">-Rs. {{ discount }}</p>
+            </div>
+            <hr class="w-11/12" />
+            <div class="flex justify-between items-center p-2 w-full text-white">
+              <p class="text-lg">Total</p>
+              <p id="final-price" class="font-bold text-primary">Rs. {{ final_price }}</p>
+            </div>
+          </div>
+          <form action="{% url 'create_order' %}" method="post" class="flex justify-center w-full">
+            {% csrf_token %}
+            {% if final_price < 10 %}
+              <button type="button" disabled class="w-11/12 p-2 bg-purple-600 cursor-not-allowed rounded-sm">Pay with Khalti</button>
+            {% else %}
+              <input type="hidden" name="voucher-code" value="" id="voucher-code-hidden" />
+              <button type="submit" class="w-11/12 p-2 bg-purple-600 hover:bg-purple-500 rounded-sm">Pay with Khalti</button>
+            {% endif %}
+          </form>
+          {% comment %} <button type="button" disabled class="w-11/12 p-2 bg-lime-600 cursor-not-allowed rounded-sm">Pay with eSewa</button> {% endcomment %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        function removeBasketItem(slug) {
-            $.ajax({
-                url: "{% url 'remove_from_basket' %}",
-                type: 'POST',
-                data: {
-                    'slug': slug,
-                    'csrfmiddlewaretoken': '{{csrf_token}}'
-                },
-                success: function(res) {
-                    $(`.basket-item-${res["slug"]}`).remove()
-                    $('#full-price').text('Rs. ' + res.basket.full_price)
-                    $('#discount').text('-Rs. ' + res.basket.discount)
-                    $('#total-discount').text('-Rs. ' + res.basket.discount)
-                    $('#final-price').text('Rs. ' + res.basket.final_price)
-                    $('#voucher-code-field').val('').css('border', '2px solid #6b7280').css('color', '#6b7280')
-                    $('#voucher-container').removeClass('flex').addClass('hidden')
-                    $('#voucher-code-hidden').val('')
-                }
-            })
+  <script>
+    function removeBasketItem(slug) {
+      $.ajax({
+        url: "{% url 'remove_from_basket' %}",
+        type: 'POST',
+        data: {
+          slug: slug,
+          csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function (res) {
+          $(`.basket-item-${res['slug']}`).remove()
+          $('#full-price').text('Rs. ' + res.basket.full_price)
+          $('#discount').text('-Rs. ' + res.basket.discount)
+          $('#total-discount').text('-Rs. ' + res.basket.discount)
+          $('#final-price').text('Rs. ' + res.basket.final_price)
+          $('#voucher-code-field').val('').css('border', '2px solid #6b7280').css('color', '#6b7280')
+          $('#voucher-container').removeClass('flex').addClass('hidden')
+          $('#voucher-code-hidden').val('')
         }
-    </script>
-    <script>
+      })
+    }
+  </script>
+  <script>
         $(document).ready(function() {
             $('#voucher-code-field').on('input', function() {
                 $('#voucher-code-hidden').val($(this).val())

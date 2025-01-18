@@ -1,0 +1,61 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+  Add New Voucher | Babal.Store
+{% endblock %}
+{% block dashboard_content %}
+  <div class="px-10 flex items-center justify-between mb-10">
+    <div class="flex items-center gap-2">
+      <a href="{% url 'dashboard_vouchers' %}"><i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i></a>
+      <h1 class="text-3xl">Add A New Voucher</h1>
+    </div>
+  </div>
+  <form class="m-0 p-0" method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-2 gap-10 px-10">
+        <div class="">
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <label for="voucher_code" class="text-2xl w-full">Voucher Code</label>
+                <div class="flex gap-10 items-center mb-5">
+                    <input required class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="voucher_code" name="voucher_code" placeholder="Voucher Code (ALL CAPS)">
+                </div>
+
+                <label for="voucher_type" class="text-2xl w-full">Voucher Type</label>
+                <div class="flex gap-10 items-center">
+                    <select name="voucher_type" id="voucher_type" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96">
+                        <option selected disabled value="">Select voucher type</option>
+                        <option value="amount">Amount</option>
+                        <option value="percentage">Percentage</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+                <label for="minimum_spend" class="text-2xl w-full">Minimum Spend</label>
+                <div class="flex gap-10 items-center mb-5">
+                    <input required type="number" step="0.01" value="0.00" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="minimum_spend" name="minimum_spend" placeholder="Minimum Spend Needed to get Discount">
+                </div>
+                <label for="max_discount_amount" class="text-2xl w-full">Max. Discount Amount</label>
+                <div class="flex gap-10 items-center mb-5">
+                    <input required type="number" value="0.00" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="max_discount_amount" name="max_discount_amount" placeholder="Maximum Discount Amount">
+                </div>
+                <label for="percentage_discount" class="text-2xl w-full">Discount Percentage</label>
+                <div class="flex gap-10 items-center mb-5">
+                    <input required type="number" value="0.00" step="0.01" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="percentage_discount" name="percentage_discount" placeholder="Discount %">
+                </div>
+            </div>
+            <div class="w-full p-2 mt-2 mb-5 rounded-xl flex justify-end">
+                <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Upload</span><button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+  {% block tab_highlight %}
+    <script type="text/javascript">
+      $('.vouchers-tab').addClass('text-secondary')
+      $('.vouchers-tab').addClass('bg-gray-700')
+    </script>
+  {% endblock %}
+{% endblock %}

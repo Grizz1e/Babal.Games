@@ -1,4 +1,6 @@
+{% load i18n %}
 {% load static %}
+{% language 'en' %}
 <!DOCTYPE html class="dark">
 <html lang="en" class="scroll-smooth">
 
@@ -62,17 +64,17 @@
                     </button>
                     <div class="ml-4 flex lg:ml-0 items-center">
                         <a href="/">
-                            <span class="sr-only">Babal Games</span>
+                            <span class="sr-only">Babal Store</span>
                             <div class="flex gap-4 items-center">
                                 <img class="h-12 w-auto" src="{% static 'core/logo_2.png'%}">
                                 <p class="brand-name text-2xl flex items-center"><span class="w-full">BABAL<span
-                                            class="font-black text-4xl text-primary">.</span>GAMES</span></p>
+                                            class="font-black text-4xl text-primary">.</span>STORE</span></p>
                             </div>
                         </a>
 
                     </div>
                     <div class="hidden lg:block">
-                        <form action="{% url 'resultpage' %}" class="mb-0 ml-10 relative">
+                        <form class="mb-0 ml-10 relative" method="get" action="{% url 'resultpage' %}">
                             <input type="text" name="q" id="search-field"
                                 class="h-10 rounded w-[500px] outline-none text-black indent-5 uppercase placeholder:normal-case"
                                 placeholder="Search your favourite games" autocomplete="off">
@@ -88,8 +90,12 @@
                     </div>
 
                     <div class="ml-auto flex items-center">
+                        {% if user.is_staff %}
+                        <a href="{% url 'dashboard_overview' %}" class="bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
+                            <i class="ph ph-chart-line"></i>
+                        {% endif %}
                         {% if user.is_authenticated %}
-                        <a href="{% url 'profilepage' %}" class="bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
+                        <a href="{% url 'profilepage' %}" class="ml-7 bg-gray-700 hover:bg-gray-600 p-2.5 rounded hidden lg:block text-xl">
                             <i class="ph ph-user"></i>
                         </a>
                         {% else %}
@@ -99,42 +105,54 @@
                             <a href="{% url 'wishlistpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded">
                                 <i class="ph-fill ph-heart-straight"></i>
                             </a>
-                            <span
-                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{wishlist_count}}</span>
+                            <span id="wishlist-count"
+                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1"></span>
                         </div>
                         <div class="relative flex items-center justify-center p-3 ml-4">
                             <a href="{% url 'basketpage' %}" class="bg-gray-700 hover:bg-gray-600 p-3 rounded flex items-center gap-2">
                                 <i class="ph-fill ph-basket"></i> <span
-                                    class="hidden lg:block text-sm">Rs.{{basket_value}}</span>
+                                    class="hidden lg:block text-sm" id="basket-value">Rs. {% if not basket_value %}0.00{% else %}{{basket_value}}{% endif %}</span>
                             </a>
-                            <span
-                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{{basket_count}}</span>
+                            <span id="basket-count"
+                                class="absolute top-0 right-0 w-6 h-6 bg-primary rounded-full items-center flex justify-center text-black text-sm p-1">{% if basket_count %}{{basket_count}}{% else %}0{% endif %}</span>
                         </div>
                     </div>
                 </div>
-                <div class="w-full">
-                    <ul class="genre-list flex w-full justify-between">
-                        <li class="hover:text-primary">Action</li>
-                        <li class="hover:text-primary">Adventure</li>
-                        <li class="hover:text-primary">Anime</li>
-                        <li class="hover:text-primary">FPS</li>
-                        <li class="hover:text-primary">Horror</li>
-                        <li class="hover:text-primary">Indie</li>
-                        <li class="hover:text-primary">Open World</li>
-                        <li class="hover:text-primary">Racing</li>
-                        <li class="hover:text-primary">RPG</li>
-                        <li class="hover:text-primary">Simulation</li>
-                        <li class="hover:text-primary">Sports</li>
-                    </ul>
+                {% block genre %}
+                <div class="w-full flex flex-col">
+                    <div class="w-full">
+                        <ul id="genre-list" class="genre-list flex w-full justify-between items-center">
+                            <button id="show-all" class="px-2 py-1 border-2 border-primary rounded text-primary cursor-pointer">Show All</button>
+                        </ul>
+                    </div>
+                    <div id="all-genre-list" class="w-full bg-gray-900 my-4 rounded hidden">
+                        <ul class="genre-list grid grid-cols-4 text-center w-full py-4">
+                        </ul>
+                    </div>
                 </div>
+                {% endblock %}
             </div>
         </nav>
     </header>
+    {% for message in messages %}
+    
+    <div class="w-full {% if message.tags == "error" %}bg-red-400{% else %}bg-green-400{% endif %} flex items-center justify-center gap-5 text-black text-2xl py-1 px-2">
+        <i class="ph-bold {% if message.tags == "error" %}ph-warning{% else %}ph-check{% endif %}"></i><span>{{message}}</span>
+    </div>
+
+{% endfor %}
     {% block content %}{% endblock %}
+    {% comment %} <section class="w-full bg-gray-800 p-4 flex flex-col items-center justify-center">
+            <h1>©️ Babal.Store</h1>
+            <div>
+                <p class="flex gap-10 text-primary"><span class="hover:underline hover:text-secondary cursor-pointer">Terms &amp; Conditions</span><span class="hover:underline hover:text-secondary cursor-pointer">Privacy Policy</span></p>
+            </div>
+    </section> {% endcomment %}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    {% endblock %}
 
     <script type="text/javascript">
         if (localStorage.getItem('popupclosed') == 'true') {
@@ -157,29 +175,28 @@
         });
         
         $(document).on('mousedown', function (e) {
-            console.log('mousedown event fired');
             if (!$(e.target).closest('#search-result-box, #search-field').length) {
-                console.log('Click outside detected');
                 $('#search-result-box').addClass('hidden');
             }
         });
         
         $('#search-field').on('focusin', function () {
-            console.log('focusin event fired');
             if ($(this).val().trim().length > 0) {
                 $('#search-result-box').removeClass('hidden');
             }
         });
+
+        $('#show-all').on('click', function () {
+            $('#all-genre-list').toggle()
+        })
         
         $('#search-field').keyup(function () {
             var data = $(this).val();
-            console.log('Search field keyup event fired with value:', data);
             if (data.length > 0) {
                 $.ajax({
                     type: 'GET',
-                    url: `/search?q=${data}`,
+                    url: `/backend/search?q=${data}`,
                     success: function (response) {
-                        console.log('AJAX request successful, response:', response);
                         $('.results').empty();
                         if (response.length < 1) {
                             $('.results').append('<p class="text-gray-400">No results for the given query</p>');
@@ -209,8 +226,37 @@
                 $('#search-result-box').addClass('hidden');
             }
         });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/backend/get_base_info',
+                method: 'GET',
+                success: function (data) {
+                    ten_genres = data.genres.slice(-9)
+                    ten_genres.forEach(function (genre) {
+                        $('#genre-list').prepend(`<li class="hover:text-primary">
+                        <a href="/genre/${genre.slug}">${genre.display_name}
+                        </li>`);
+                    });
+                    data.genres.forEach(function (genre) {
+                        $('#all-genre-list ul').prepend(`<li class="hover:text-primary">
+                        <a href="/genre/${genre.slug}">${genre.display_name}
+                        </li>`);
+                    });
+                    $('#wishlist-count').text(data.wishlist.count.toLocaleString())
+                    $('#basket-count').text(data.basket.count.toLocaleString())
+                    $('#basket-value').text(`Rs. ${data.basket.value.toLocaleString()}`)
+                },
+                error: function (error) {
+                    console.error('Error fetching genres:', error);
+                }
+            });
+        });
     </script>
     
 </body>
 
 </html>
+{% endlanguage %}

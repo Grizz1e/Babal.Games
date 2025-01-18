@@ -1,0 +1,77 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Genre Dashboard | Babal.Store{% endblock %}
+
+
+{% block dashboard_content %}
+  <div class="h-full">
+    <div class="filterbox flex justify-between items-center mb-4">
+        <form class="m-0">
+          <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a game" name="q" value="{{ request.GET.q }}" />
+          <button type="submit">Go</button>
+        </form>
+        <a href="{% url 'dashboard_add_genre' %}" class="border-2 border-primary text-primary font-bold hover:text-black hover:bg-primary px-2 py-1 rounded">Add new genre</a>
+    </div>
+    <div class="w-full">
+      <div class="grid grid-cols-3 w-full gap-2">
+        {% for genre in genres %}
+        <div id="genre-{{ genre.slug }}" class="p-2 mb-2 rounded w-full bg-gray-800 flex items-center gap-2">
+            <div class="font-bold flex w-full items-center justify-between">
+              <div class="flex items-center text-gray-300">
+                <a href="{% url 'genrepage' genre.slug %}" class="hover:text-secondary text-primary">{{ genre.display_name }}</a>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="ph ph-trash-simple text-2xl text-red-400 hover:text-red-300 hover:cursor-pointer" onclick="removeGenre('{{ genre.slug }}')"></i>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="mt-5 flex items-center">
+        <div class="flex items-center justify-between">
+          <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={% if genres.has_previous %}{{ genres.previous_page_number }}{% else %}1{% endif %}">
+            <i class="ph ph-caret-left"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ genres.number }}">{{ genres.number }}</a>
+          <a class="px-2"
+            href="?q={{ request.GET.q }}&page={% if genres.has_next %}{{ genres.next_page_number }}{% else %}{{ genres.paginator.num_pages }}{% endif %}">
+            <i class="ph ph-caret-right"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ genres.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+        </div>
+        <span class="px-2">Go to page</span>
+        <form class="items-center h-fit my-auto flex">
+          <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ genres.number }}" />
+          <input type="hidden" name="q" value="{{ request.GET.q }}" />
+          <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function removeGenre(slug) {
+        $.ajax({
+          url: "{% url 'remove_genre' %}",
+          type: 'POST',
+          data: {
+            slug: slug,
+            csrfmiddlewaretoken: '{{csrf_token}}'
+          },
+          success: function (res) {
+            $(`#genre-${slug}`).remove()
+          }
+        })
+    }
+</script>
+
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.genres-tab').addClass('text-secondary')
+    $('.genres-tab').addClass('bg-gray-700')
+  </script>
+{% endblock %}
+{% endblock %}

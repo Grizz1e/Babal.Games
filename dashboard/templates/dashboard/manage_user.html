@@ -1,0 +1,89 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Manage @{{user.username}} | Babal.Store{% endblock %}
+{% block dashboard_content %}
+<div class="px-10 flex items-center justify-between mb-10">
+    <div class="flex items-center gap-2">
+            <a href="{% if request.GET.referer %}{% url request.GET.referer %}{% else %}{% url 'dashboard_users' %}{% endif %}?page={{request.GET.page}}&q={{request.GET.q}}">
+                <i class="text-3xl ph-bold ph-arrow-left text-gray-400 hover:text-primary"></i>
+            </a>
+            <h1 class="text-3xl">Manage @{{ user.username }}</h1>
+    </div>
+</div>
+<div class="grid grid-cols-2 gap-10 px-10">
+  <div class="">
+    <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+      <form class="" method="post">
+        {% csrf_token %}
+        <label for="username" class="text-2xl w-full">Username</label>
+        <div class="flex gap-10 items-center">
+            <input class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="username" name="username" value="{{user.username}}">
+            <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+        </div>
+      </form>
+      <form class="" method="post">
+        {% csrf_token %}
+        <label for="first_name" class="text-2xl w-full">First Name</label>
+        <div class="flex gap-10 items-center">
+            <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="first_name" name="first_name" value="{{user.first_name}}">
+            <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+        </div>
+      </form>
+      <form class="" method="post">
+        {% csrf_token %}
+        <label for="last_name" class="text-2xl w-full">Last Name</label>
+        <div class="flex gap-10 items-center">
+            <input type="text" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="last_name" name="last_name" value="{{user.last_name}}">
+            <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+        </div>
+      </form>
+    </div>
+    <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+      <form class="" method="post">
+        {% csrf_token %}
+        <label for="email_address" class="text-2xl w-full">Email Address</label>
+        <div class="flex gap-10 items-center">
+          <input type="email" class="bg-gray-800 outline-none border-none h-9 indent-4 w-96" id="email_address" name="email_address" value="{{user.email}}">
+          <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+        </div>
+      </form>
+    </div>
+    <div class="w-full border-2 border-gray-400 hover:border-primary p-2 mt-2 mb-5 rounded-xl">
+      <form class="" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="permissions">
+          <p class="text-2xl w-full">User permissions</p>
+          <div class="flex gap-10 items-center">
+              <div class="h-52 w-96 p-2 bg-gray-800 overflow-y-scroll flex-wrap rounded">
+                  <input class="hidden" type="checkbox" id="is_admin" name="is_admin" {% if user.is_superuser %}checked{% endif %}>
+                  <label for="is_admin" class="permission-label inline-flex px-2 m-1 {% if user.is_superuser %}border-primary text-black bg-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Admin</label>
+                  <input class="hidden" type="checkbox" id="is_staff" name="is_staff" {% if user.is_staff %}checked{% endif %}>
+                  <label for="is_staff" class="permission-label inline-flex px-2 m-1 {% if user.is_staff %}border-primary text-black bg-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Staff</label>
+                  <input class="hidden" type="checkbox" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+                  <label for="is_active" class="permission-label inline-flex px-2 m-1 {% if user.is_active %}border-primary text-black bg-primary{% else %}border-gray-400 text-gray-400{% endif %} border-2 h-fit w-fit rounded-lg">Active</label>
+              </div>
+              <button class="rounded bg-gray-700 hover:bg-gray-600 px-4 py-2 flex items-center gap-2"><i class="ph ph-checks text-2xl"></i><span>Update</span><button>
+          </div>
+      </form>
+    </div>
+    
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="delete_user" id="delete_user" value="true">
+      <button type="submit" class="px-4 py-2 bg-red-500 rounded font-bold hover:bg-red-600">Delete User</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  $('.permission-label').click(function () {
+    $(this).toggleClass('border-gray-400 text-gray-400 border-primary text-black bg-primary')
+  })
+</script>
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.users-tab').addClass('text-secondary')
+    $('.users-tab').addClass('bg-gray-700')
+  </script>
+{% endblock %}
+{% endblock %}

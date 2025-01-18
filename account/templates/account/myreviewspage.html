@@ -4,16 +4,17 @@
 
 {% block profile_content %}
     <div class="container mt-4">
+        {% if user_reviews %}
         {% for review in user_reviews %}
         <h1 class="mt-4 text-gray-400">{{review.review_date}}</h1>
         <div class="row">
             <div class="col-md-12 bg-gray-800 rounded p-4">
                 <div class="flex items-center justify-between text-primary">
                     <div class="flex gap-2 items-center">
-                        <img src={{review.game.banner.url}} loading="lazy" class="w-20 aspect-2">
+                        <img src="{{review.game.banner.url}}" loading="lazy" class="w-20 aspect-2">
                         <h1>{{review.game.display_name}}</h1>
                     </div>
-                    <a href="{% url 'gamepage' review.game.slug%}#review" class="border-primary border-2 px-2 py-1 font-bold rounded hover:bg-primary hover:text-gray-800">Update Review</a>
+                    <a href="{% url 'gamepage' review.game.slug %}#review_content" class="border-primary border-2 px-2 py-1 font-bold rounded hover:bg-primary hover:text-gray-800">Update Review</a>
                 </div>
                 <div class="text-yellow-400">
                     {% if review.rating > 4 %}
@@ -52,6 +53,11 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+          <span class="text-xl text-black"><i class="ph ph-warning"></i> No reviews available!</span>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}
 

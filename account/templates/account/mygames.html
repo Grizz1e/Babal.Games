@@ -1,0 +1,33 @@
+{% extends 'core/profile_base.html' %}
+{% load custom_tag %}
+{% block title %}{{user.username}}'s Games | Babal.Games{% endblock %}
+    {% block profile_content %}
+    <div class="w-full mt-4 gap-4">
+        {% if licensed_games %}
+        {% for game in licensed_games %}
+        <div class="bg-gray-800 mt-2 rounded p-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <img src="{{game.banner.url}}" alt="{{game.display_name}}" loading="lazy" class="rounded w-28 aspect-2 object-cover">
+                    <a href={% url 'gamepage' game.slug %} class="text-gray-300">{{game.display_name}}</a>
+                </div>
+                <form method="post" action="{% url 'download_game' game.slug %}" class="flex gap-5 justify-center items-center m-0">
+                    {% csrf_token %}
+                    <button class="game-key hover:text-black border-2 px-2 rounded font-bold border-primary text-primary hover:bg-primary">Download</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+          <span class="text-xl text-black"><i class="ph ph-warning"></i> No products purchased yet!</span>
+        </div>
+        {% endif %}
+    </div>
+    {% endblock %}
+    {% block tab_highlight %}
+    <script type="text/javascript">
+        $('.my-keys-tab').addClass('text-white')
+        $('.my-keys-tab-icon').addClass('text-secondary')
+    </script>
+    {% endblock %}

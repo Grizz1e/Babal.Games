@@ -1,39 +1,141 @@
 {% extends 'account/profilepage.html' %}
 {% load custom_tag %}
-{% block title %}{{user.username}}'s Order History | Babal.Games{% endblock %}
-    {% block profile_content %}
-        <div class="w-full mt-4">
-            {% for order in user_orders %}
-            <h1 class="px-4 mt-4 text-gray-400">{{order.order_date}}</h1>
-            <div class="bg-gray-800 mt-2 rounded p-4" id="{{order.order_id}}">
-                <div class="flex justify-between">
-                    <div>
-                        <h1 class="text-primary uppercase text-sm mb-4">#{{order.order_id}}</h1>
-                        {% for game in order|order_games_list %}
-                        <div class="flex items-center gap-2 mb-2">
-                            <img src="{{game.banner.url}}" alt="{{game.display_name}}" loading="lazy" class="rounded w-20 aspect-2 object-cover">
-                            <p class="text-gray-300">{{game.display_name}}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="grid grid-cols-2 h-fit">
-                        <p class="flex items-center">Rs. {{order.total_price}}</p>
-                        {% if order.is_payment_successful %}
-                        <p class="min-w-24 text-center py-1 rounded bg-green-500">Paid</p>
-                        {% else %}
-                        <a href="https://test-pay.khalti.com/?pidx={{order.pidx}}" class="flex min-w-24 justify-center py-1 rounded bg-yellow-500">Pay Now</a>
-                        <div class="w-full h-full"></div>
-                        <a href="{% url 'verify_payment' %}?pidx={{order.pidx}}" class="text-sm text-gray-400 hover:underline flex justify-center">Already Paid?</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+{% block title %}
+  {{ user.username }}'s Order History | Babal.Games
+{% endblock %}
+{% block profile_content %}
+  <div class="w-full mt-4">
+    {% if orders %}
+    {% for order in orders %}
+      <h1 class="px-4 mt-4 text-gray-400">{{ order.order_date }}</h1>
+      <div class="bg-gray-800 mt-2 rounded p-4" id="{{ order.order_id }}">
+        <div class="grid grid-cols-12">
+          <div class="col-span-10">
+            <h1 class="text-primary uppercase text-sm mb-4">#{{ order.order_id }}</h1>
+            {% for game in order|order_games_list %}
+              <div class="flex items-center gap-2 mb-2">
+                <img src="{{ game.banner.url }}" alt="{{ game.display_name }}" loading="lazy" class="rounded w-20 aspect-2 object-cover" />
+                <a class="text-gray-300" href="{% url 'gamepage' game.slug %}">{{ game.display_name }}</a>
+              </div>
             {% endfor %}
+          </div>
+          <div class="col-span-2 flex flex-col">
+            {% if order.status == 1 %}
+              <div class="grid grid-cols-2 items-center">
+                {% if order.voucher_amount > 0 %}
+                  <div>
+                    <p class="text-center">Rs. {{ order.total_price|subtract:order.voucher_amount }}</p>
+                    <p class="text-center line-through text-gray-400">Rs. {{ order.total_price }}</p>
+                  </div>
+                {% else %}
+                  <p class="text-center">Rs. {{ order.total_price }}</p>
+                {% endif %}
+                <a href="https://test-pay.khalti.com/?pidx={{ order.pidx }}" class="w-full text-center px-2 py-1 rounded hover:bg-primary border-primary border-2 font-bold text-primary hover:text-black">Pay Now</a>
+              </div>
+              <div class="flex flex-col h-full justify-between">
+                <form method="post" class="w-full my-0 flex justify-end">
+                  {% csrf_token %}
+                  <input type="hidden" name="order_id" value="{{ order.order_id }}" />
+                  <button type="submit" class="text-gray-400 text-sm hover:text-gray-300 text-right">Cancel Order?</button>
+                </form>
+                <p class="text-red-400 text-sm text-right">
+                  Expires in: <span id="timer-order-{{ order.id }}"></span>
+                </p>
+              </div>
+            {% elif order.status == 2 %}
+              <div class="grid grid-cols-2 items-center">
+                {% if order.voucher_amount > 0 %}
+                  <div>
+                    <p class="text-center">Rs. {{ order.total_price|subtract:order.voucher_amount }}</p>
+                    <p class="text-center line-through text-gray-400">Rs. {{ order.total_price }}</p>
+                  </div>
+                {% else %}
+                  <p class="text-center">Rs. {{ order.total_price }}</p>
+                {% endif %}
+                <a class="w-full text-center px-2 py-1 rounded bg-green-500 cursor-pointer">Purchased</a>
+              </div>
+            {% elif order.status == 3 %}
+              <div class="grid grid-cols-2 items-center">
+                {% if order.voucher_amount > 0 %}
+                  <div>
+                    <p class="text-center">Rs. {{ order.total_price|subtract:order.voucher_amount }}</p>
+                    <p class="text-center line-through text-gray-400">Rs. {{ order.total_price }}</p>
+                  </div>
+                {% else %}
+                  <p class="text-center">Rs. {{ order.total_price }}</p>
+                {% endif %}
+                <a class="w-full text-center px-2 py-1 rounded bg-yellow-500 cursor-pointer">Cancelled</a>
+              </div>
+            {% elif order.status == 4 %}
+              <div class="grid grid-cols-2 items-center">
+                {% if order.voucher_amount > 0 %}
+                  <div>
+                    <p class="text-center">Rs. {{ order.total_price|subtract:order.voucher_amount }}</p>
+                    <p class="text-center line-through text-gray-400">Rs. {{ order.total_price }}</p>
+                  </div>
+                {% else %}
+                  <p class="text-center">Rs. {{ order.total_price }}</p>
+                {% endif %}
+                <a class="w-full text-center px-2 py-1 rounded bg-red-500">Expired</a>
+              </div>
+            {% endif %}
+          </div>
         </div>
-    {% endblock %}
-    {% block tab_highlight %}
-        <script type="text/javascript">
-            $('.order-history-tab').addClass('text-white')
-            $('.order-history-tab-icon').addClass('text-secondary')
-        </script>
-    {% endblock %}
+      </div>
+    {% endfor %}
+    {% else %}
+    <div class="flex my-4 bg-red-400 p-4 rounded-sm w-full items-center gap-1">
+      <span class="text-xl text-black"><i class="ph ph-warning"></i> No order history!</span>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.order-history-tab').addClass('text-white')
+    $('.order-history-tab-icon').addClass('text-secondary')
+  </script>
+{% endblock %}
+{% block extrascripts %}
+  <script>
+  $(document).ready(function () {
+      function startCountdown(orderId, expirationTime) {
+          const $timerElement = $('#timer-order-' + orderId);
+
+          function updateTimer() {
+              const now = new Date().getTime();
+              const distance = expirationTime - now;
+
+              if (distance <= 0) {
+                  $timerElement.text("Expired");
+              } else {
+                  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  $timerElement.text(minutes + "m " + seconds + "s");
+              }
+          }
+
+          updateTimer();
+          const intervalId = setInterval(() => {
+              updateTimer();
+              if (new Date().getTime() >= expirationTime) {
+                  clearInterval(intervalId);
+              }
+          }, 1000);
+      }
+
+      {% for order in orders %}
+          {% if order.status == 1 %}
+              const orderExpirationTime = new Date("{{ order.order_date|date:"Y-m-d H:i:s" }}").getTime() + 30 * 60 * 1000;
+              startCountdown({{ order.id }}, orderExpirationTime);
+          {% endif %}
+      {% endfor %}
+  });
+</script>
+
+  {% for order in orders %}
+    {% if order.status == 1 %}
+      <div id="timer-{{ order.id }}"></div>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

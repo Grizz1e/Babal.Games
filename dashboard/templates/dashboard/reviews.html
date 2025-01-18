@@ -1,0 +1,106 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+  User Reviews Dashboard | Babal.Store
+{% endblock %}
+{% block dashboard_content %}
+  <section class="container">
+    <div class="">
+      {% for review in reviews %}
+        <div class="row mb-4" id="review-{{review.id}}">
+          <div class="col-md-12 bg-gray-800 rounded p-4">
+            <div class="flex items-center justify-between text-primary">
+              <div class="flex gap-2 items-center">
+                <img src="{{ review.game.banner.url }}" loading="lazy" class="w-20 aspect-2" />
+                <h1>{{ review.game.display_name }}</h1>
+              </div>
+              <button type="button" onclick="removeReview({{review.id}})" class="px-2 py-1 font-bold rounded bg-red-500 text-black hover:bg-red-400">Delete Review</a>
+            </div>
+            <div class="text-yellow-400">
+              {% if review.rating > 4 %}
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+              {% elif review.rating > 3 %}
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+              {% elif review.rating > 2 %}
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+              {% elif review.rating > 1 %}
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+              {% elif review.rating > 0 %}
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+                <i class="ph-bold ph-star"></i>
+              {% endif %}
+            </div>
+            <h1 class="text-gray-300 leading-5 max-w-[40rem]">{{ review.review }}</h1>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-5 flex items-center">
+      <div class="flex items-center justify-between">
+        <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+        <a class="px-2"
+          href="?q={{ request.GET.q }}&page={% if reviews.has_previous %}
+            {{ reviews.previous_page_number }}
+          {% else %}
+            1
+          {% endif %}">
+          <i class="ph ph-caret-left"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ reviews.number }}">{{ reviews.number }}</a>
+        <a class="px-2"
+          href="?q={{ request.GET.q }}&page={% if reviews.has_next %}
+            {{ reviews.next_page_number }}
+          {% else %}
+            {{ reviews.paginator.num_pages }}
+          {% endif %}">
+          <i class="ph ph-caret-right"></i>
+        </a>
+        <a class="px-2" href="?q={{ request.GET.q }}&page={{ reviews.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+      </div>
+      <span class="px-2">Go to page</span>
+      <form class="items-center h-fit my-auto flex">
+        <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ reviews.number }}" />
+        <input type="hidden" name="q" value="{{ request.GET.q }}" />
+        <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script type="text/javascript">
+    function removeReview(id) {
+      $.ajax({
+        url: "{% url 'remove_review' %}",
+        type: 'POST',
+        data: {
+          id: id,
+          csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function (res) {
+          $(`#review-${id}`).remove()
+        }
+      })
+    }
+  </script>
+  {% block tab_highlight %}
+
+  {% endblock %}
+{% endblock %}

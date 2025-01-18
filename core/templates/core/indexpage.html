@@ -2,252 +2,341 @@
 {% load static %}
 {% load custom_tag %}
 {% block title %}
-Buy Games at Cheapest Price | Babal Games
+  Buy Games at Cheapest Price | Babal Games
 {% endblock %}
 
 {% block content %}
-<section class="container">
-    <div class="mx-auto max-w-7xl px-8 py-2">
-        <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
-            <div class="container">
-                <h2 class="text-2xl mt-6 mb-4 ml-10">Featured Deals</h2>
-            </div>
-            <div class="featured-section container flex items-center gap-4">
-                <div class="arrow-left text-gray-400 hover:text-white text-2xl hidden lg:block">
-                    <button class="prev-arrow"><i class="ph-bold ph-caret-left"></i></button>
-                </div>
-                <div class="carousel-list container">
-                    {%for featured_game in featured_games %}
-                    <div
-                        class="featured-game-{{ forloop.counter }} {% if forloop.counter == 1 %} flex {% else %} hidden {% endif %} bg-gray-800 rounded-xl flex-col lg:flex-row w-fit container shadow-sm">
-                        <img src="/media/{{featured_game.game.banner}}" alt="" loading="lazy"
-                            class="w-[45rem] object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none aspect-[5/3]">
-                        <div class="description-right container p-4 flex flex-col justify-between">
-                            <div class="">
-                                <div class="carousel-header flex text-center items-center justify-between">
-                                    <div class="tag flex">
-                                        <!-- <p class="bg-fuchsia-400 w-fit pl-2 pr-1 text-black font-bold text-sm">
+  <div class="mx-auto max-w-7xl px-8 py-2">
+    <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
+      <div class="container">
+        <h2 class="text-2xl mt-6 mb-4 ml-10">Featured Deals</h2>
+      </div>
+      <div class="featured-section container flex items-center gap-4">
+        <div class="arrow-left text-gray-400 hover:text-white text-2xl hidden lg:block">
+          <button class="prev-arrow"><i class="ph-bold ph-caret-left"></i></button>
+        </div>
+        <div class="carousel-list container">
+          {% for featured_game in featured_games %}
+            <div class="featured-game-{{ forloop.counter }} {% if forloop.counter == 1 %}
+                 flex
+              {% else %}
+                 hidden
+              {% endif %} bg-gray-800 rounded-xl flex-col lg:flex-row w-fit container shadow-sm">
+              <img src="/media/{{ featured_game.game.banner }}" alt="" loading="lazy" class="w-[45rem] object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none aspect-[5/3]" />
+              <div class="description-right container p-4 flex flex-col justify-between">
+                <div class="">
+                  <div class="carousel-header flex text-center items-center justify-between">
+                    <div class="tag flex">
+                      <!--  <p class="bg-fuchsia-400 w-fit pl-2 pr-1 text-black font-bold text-sm">
                                             NEWLY ADDED
-                                        </p> -->
-                                        <p class="w-fit pl-2 pr-1 text-black font-bold text-sm uppercase"
-                                            style="background-color: {{featured_game.tag_color_code}};">
-                                            {{featured_game.tag}}
-                                        </p>
-                                        <div class="slash h-auto w-6"
-                                            style="background: linear-gradient(-66deg, transparent, transparent 49%, #{{featured_game.tag_color_code}} 51%, #{{featured_game.tag_color_code}})">
-                                        </div>
-                                    </div>
-                                    <a href=""
-                                        class="group add-to-wishlist text-gray-400 flex items-center gap-3 hover:text-primary">
-                                        {% if featured_game.game.id in wishlisted_games %}
-                                        <p class="group-hover:underline">Remove from wishlist</p>
-                                        <i class="ph-fill ph-heart-straight"></i>
-                                        {% else %}
-                                        <form method="post" action="{% url 'add_to_wishlist' featured_game.game.id %}" class="m-0">
-                                            {% csrf_token %}
-                                            <button type="submit" class="flex items-center gap-3">
-                                                <p class="group-hover:underline">Add to wishlist</p>
-                                                <i class="ph-bold ph-heart-straight"></i>
-                                            </button>
-                                        </form>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                                <div class="feat-game-info-container container my-2 h-max">
-                                    <a href="/game/{{featured_game.game.slug}}"
-                                        class="feat-game-title text-3xl">{{featured_game.game.display_name}}</a>
-                                    <div
-                                        class="rating-container container text-yellow-400 my-2 flex gap-2 items-center">
-                                        <div class="stars">
-                                            <!-- 1 star -->
-                                            {% if featured_game.average_rating >= 1 %}
-                                            <i class="ph-fill ph-star"></i>
-                                            {% elif featured_game.average_rating > 0 %}
-                                            <i class="ph-fill ph-star-half"></i>
-                                            {% else %}
-                                            <i class="ph-bold ph-star"></i>
-                                            {% endif %}
-                                            <!-- 2 star -->
-                                            {% if featured_game.average_rating >= 2 %}
-                                            <i class="ph-fill ph-star"></i>
-                                            {% elif featured_game.average_rating > 1 %}
-                                            <i class="ph-fill ph-star-half"></i>
-                                            {% else %}
-                                            <i class="ph-bold ph-star"></i>
-                                            {% endif %}
-                                            <!-- 3 star -->
-                                            {% if featured_game.average_rating >= 3 %}
-                                            <i class="ph-fill ph-star"></i>
-                                            {% elif featured_game.average_rating > 2 %}
-                                            <i class="ph-fill ph-star-half"></i>
-                                            {% else %}
-                                            <i class="ph-bold ph-star"></i>
-                                            {% endif %}
-                                            <!-- 4 star -->
-                                            {% if featured_game.average_rating >= 4 %}
-                                            <i class="ph-fill ph-star"></i>
-                                            {% elif featured_game.average_rating > 3 %}
-                                            <i class="ph-fill ph-star-half"></i>
-                                            {% else %}
-                                            <i class="ph-bold ph-star"></i>
-                                            {% endif %}
-                                            <!-- 5 star -->
-                                            {% if featured_game.average_rating == 5 %}
-                                            <i class="ph-fill ph-star"></i>
-                                            {% elif featured_game.average_rating > 4 %}
-                                            <i class="ph-fill ph-star-half"></i>
-                                            {% else %}
-                                            <i class="ph-bold ph-star"></i>
-                                            {% endif %}
-                                        </div>
-                                        <div class="average-rating text-gray-300">{{featured_game.average_rating}} out
-                                            of 5</div>
-                                        <div class="total-ratings text-gray-400">({{featured_game.total_rating}})</div>
-                                    </div>
-                                    <p class="feat-game-description text-gray-400 leading-5">
-                                        {{featured_game.game.description}}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="feat-add-to-cart-container container w-full">
-                                <form action="{% url 'add_to_basket' featured_game.game.id %}" method="post" class="w-full">
-                                    {% csrf_token %}
-                                    <button type="submit"
-                                        class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add
-                                        to basket</button>
-                                </form>
-                            </div>
-                        </div>
+                                        </p>  -->
+                      <p class="w-fit pl-2 pr-1 text-black font-bold text-sm uppercase" style="background-color: {{ featured_game.tag_color_code }};">{{ featured_game.tag }}</p>
+                      <div class="slash h-auto w-6" style="background: linear-gradient(-66deg, transparent, transparent 49%, #{{ featured_game.tag_color_code }} 51%, #{{ featured_game.tag_color_code }})"></div>
                     </div>
-                    {% endfor %}
+                    <a href="" class="group add-to-wishlist text-gray-400 flex items-center gap-3 hover:text-primary">
+                      {% if featured_game.game.id in wishlisted_games %}
+                        <p class="group-hover:underline">Remove from wishlist</p>
+                        <i class="ph-fill ph-heart-straight"></i>
+                      {% else %}
+                        <form method="post" action="{% url 'add_to_wishlist' featured_game.game.id %}" class="m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="flex items-center gap-3">
+                            <p class="group-hover:underline">Add to wishlist</p>
+                            <i class="ph-bold ph-heart-straight"></i>
+                          </button>
+                        </form>
+                      {% endif %}
+                    </a>
+                  </div>
+                  <div class="feat-game-info-container container my-2 h-max">
+                    <a href="/game/{{ featured_game.game.slug }}" class="feat-game-title text-3xl">{{ featured_game.game.display_name }}</a>
+                    <div class="rating-container container text-yellow-400 my-2 flex gap-2 items-center">
+                      <div class="stars">
+                        <!-- 1 star -->
+                        {% if featured_game.average_rating >= 1 %}
+                          <i class="ph-fill ph-star"></i>
+                        {% elif featured_game.average_rating > 0 %}
+                          <i class="ph-fill ph-star-half"></i>
+                        {% else %}
+                          <i class="ph-bold ph-star"></i>
+                        {% endif %}
+                        <!-- 2 star -->
+                        {% if featured_game.average_rating >= 2 %}
+                          <i class="ph-fill ph-star"></i>
+                        {% elif featured_game.average_rating > 1 %}
+                          <i class="ph-fill ph-star-half"></i>
+                        {% else %}
+                          <i class="ph-bold ph-star"></i>
+                        {% endif %}
+                        <!-- 3 star -->
+                        {% if featured_game.average_rating >= 3 %}
+                          <i class="ph-fill ph-star"></i>
+                        {% elif featured_game.average_rating > 2 %}
+                          <i class="ph-fill ph-star-half"></i>
+                        {% else %}
+                          <i class="ph-bold ph-star"></i>
+                        {% endif %}
+                        <!-- 4 star -->
+                        {% if featured_game.average_rating >= 4 %}
+                          <i class="ph-fill ph-star"></i>
+                        {% elif featured_game.average_rating > 3 %}
+                          <i class="ph-fill ph-star-half"></i>
+                        {% else %}
+                          <i class="ph-bold ph-star"></i>
+                        {% endif %}
+                        <!-- 5 star -->
+                        {% if featured_game.average_rating == 5 %}
+                          <i class="ph-fill ph-star"></i>
+                        {% elif featured_game.average_rating > 4 %}
+                          <i class="ph-fill ph-star-half"></i>
+                        {% else %}
+                          <i class="ph-bold ph-star"></i>
+                        {% endif %}
+                      </div>
+                      <div class="average-rating text-gray-300">{{ featured_game.average_rating }} out of 5</div>
+                      <div class="total-ratings text-gray-400">({{ featured_game.total_rating }})</div>
+                    </div>
+                    <p class="feat-game-description text-gray-400 leading-5">{{ featured_game.game.description }}</p>
+                  </div>
                 </div>
-                <div class="arrow-right text-gray-400 hover:text-white text-2xl hidden lg:block">
-                    <button class="next-arrow"><i class="ph-bold ph-caret-right"></i></button>
+                <div class="feat-add-to-cart-container container w-full">
+                  <form action="{% url 'add_to_basket' featured_game.game.id %}" method="post" class="w-full">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full uppercase text-black bg-primary hover:bg-secondary py-2 font-bold">Add to basket</button>
+                  </form>
                 </div>
+              </div>
             </div>
+          {% endfor %}
         </div>
-    </div>
-</section>
-
-<section class="container">
-    <div class="mx-auto max-w-7xl px-8 py-2">
-        <div class="ml-4 flex flex-col lg:ml-0 w-full justify-center items-center">
-            <div class="container flex items-center mt-6 mb-4 gap-4">
-                <h2 class="text-2xl ml-10">Top Sellers</h2>
-                <a href="#"
-                    class="border-2 border-primary px-2 py-1 rounded text-primary hover:bg-primary hover:text-black font-bold">Show
-                    more</a>
-            </div>
-
-            <div class="w-full flex-wrap flex gap-8 justify-center">
-                {% for game in top_sellers %}
-                <div class="container w-[22rem] overflow-hidden  bg-gray-800 rounded">
-                    <div class="image overflow-hidden relative group">
-                        <img src="/media/{{game.banner}}" alt="" loading="lazy"
-                            class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        <div
-                            class=" h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
-                            <div class="container h-full relative flex flex-col justify-center items-center">
-                                <div class="absolute top-2 right-2 text-secondary hover:text-primary text-2xl">
-                                    {% if game.id in wishlisted_games %}
-                                        <button onclick="removeWishlistItem('{{game.slug}}')" class="flex items-center gap-3">
-                                            <i class="remove-wishlist-{{game.slug}} ph-fill ph-heart-straight"></i>
-                                        </button>
-                                    {% else %}
-                                    <form method="post" action="{% url 'add_to_wishlist' game.id %}" class="m-0">
-                                        {% csrf_token %}
-                                        <button type="submit" class="flex items-center gap-3">
-                                            <i class="ph-bold ph-heart-straight"></i>
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                </div>
-                                <a href="/game/{{game.slug}}"
-                                    class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">
-                                    {{ game.display_name }}
-                                </a>
-                                <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full flex justify-center">
-                                    {% csrf_token %}
-                                    <button type="submit"
-                                        class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm">
-                                        Add to basket
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
-                        <div class="platform flex items-center gap-1 text-xl">
-                            {% if game.is_available_on_windows %}
-                            <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
-                            {% endif %}
-                            {% if game.is_available_on_mac %}
-                            <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
-                            {% endif %}
-                            {% if game.is_available_on_linux %}
-                            <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
-                            {% endif %}
-                        </div>
-                        <div class="pricing flex items-center gap-2 leading-4">
-                            {% if game.discount_amount != 0 %}
-                            <a class="bg-gray-700 p-2">-{{ game.discount_amount |percent_round:game.price }}%</a>
-                            {% endif %}
-                            <div class="flex flex-col text-right">
-                                {% if game.discount_amount != 0 %}
-                                <h2 class="line-through text-[0.8rem]">Rs. {{game.price}}</h2>
-                                {% endif %}
-                                <h2 class="text-primary font-bold">Rs. {{ game.price |subtract:game.discount_amount }}
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="arrow-right text-gray-400 hover:text-white text-2xl hidden lg:block">
+          <button class="next-arrow"><i class="ph-bold ph-caret-right"></i></button>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-8 py-2">
+    <div class="flex flex-col lg:ml-0 w-full justify-center items-center">
+      <div class="container flex items-center mt-6 mb-4 gap-4">
+        <h2 class="text-2xl ml-10">Top Rated</h2>
+        <a href="#" class="border-2 border-primary px-2 py-1 rounded text-primary hover:bg-primary hover:text-black font-bold">Show more</a>
+      </div>
+
+      <div class="w-full flex-wrap flex gap-8 justify-center">
+        
+        {% for game in top_rated %}
+          <div class="container w-[22rem] overflow-hidden bg-gray-800 rounded">
+            <div class="image overflow-hidden relative group">
+              <img src="/media/{{ game.banner }}" alt="" loading="lazy" class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
+                <div class="container h-full relative flex flex-col justify-center items-center">
+                  <div class="absolute top-2 right-2 text-secondary hover:text-primary text-2xl">
+                    {% if game.id in wishlisted_games %}
+                      <button onclick="removeWishlistItem('{{ game.slug }}')" class="flex items-center gap-3"><i class="remove-wishlist-{{ game.slug }} ph-fill ph-heart-straight"></i></button>
+                    {% else %}
+                      <form method="post" action="{% url 'add_to_wishlist' game.id %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-3"><i class="ph-bold ph-heart-straight"></i></button>
+                      </form>
+                    {% endif %}
+                  </div>
+                  <a href="/game/{{ game.slug }}" class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">{{ game.display_name }}</a>
+                  <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full flex justify-center">
+                    {% csrf_token %}
+                    <button type="submit" class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm">Add to basket</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
+              <div class="platform flex items-center gap-1 text-xl">
+                {% if game.is_available_on_windows %}
+                  <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_mac %}
+                  <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_linux %}
+                  <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+              </div>
+              <div class="pricing flex items-center gap-2 leading-4">
+                {% if game.discount_amount != 0 %}
+                  <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+                {% endif %}
+                <div class="flex flex-col text-right">
+                  {% if game.discount_amount != 0 %}
+                    <h2 class="line-through text-[0.8rem]">Rs. {{ game.price }}</h2>
+                  {% endif %}
+                  <h2 class="text-primary font-bold">Rs. {{ game.price|subtract:game.discount_amount }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="flex flex-col lg:ml-0 w-full justify-center items-center">
+      <div class="container flex items-center mt-6 mb-4 gap-4">
+        <h2 class="text-2xl ml-10">Top Sellers</h2>
+        <a href="#" class="border-2 border-primary px-2 py-1 rounded text-primary hover:bg-primary hover:text-black font-bold">Show more</a>
+      </div>
+
+      <div class="w-full flex-wrap flex gap-8 justify-center">
+        
+        {% for game in top_sellers %}
+          <div class="container w-[22rem] overflow-hidden bg-gray-800 rounded">
+            <div class="image overflow-hidden relative group">
+              <img src="/media/{{ game.banner }}" alt="" loading="lazy" class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
+                <div class="container h-full relative flex flex-col justify-center items-center">
+                  <div class="absolute top-2 right-2 text-secondary hover:text-primary text-2xl">
+                    {% if game.id in wishlisted_games %}
+                      <button onclick="removeWishlistItem('{{ game.slug }}')" class="flex items-center gap-3"><i class="remove-wishlist-{{ game.slug }} ph-fill ph-heart-straight"></i></button>
+                    {% else %}
+                      <form method="post" action="{% url 'add_to_wishlist' game.id %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-3"><i class="ph-bold ph-heart-straight"></i></button>
+                      </form>
+                    {% endif %}
+                  </div>
+                  <a href="/game/{{ game.slug }}" class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">{{ game.display_name }}</a>
+                  <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full flex justify-center">
+                    {% csrf_token %}
+                    <button type="submit" class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm">Add to basket</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
+              <div class="platform flex items-center gap-1 text-xl">
+                {% if game.is_available_on_windows %}
+                  <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_mac %}
+                  <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_linux %}
+                  <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+              </div>
+              <div class="pricing flex items-center gap-2 leading-4">
+                {% if game.discount_amount != 0 %}
+                  <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+                {% endif %}
+                <div class="flex flex-col text-right">
+                  {% if game.discount_amount != 0 %}
+                    <h2 class="line-through text-[0.8rem]">Rs. {{ game.price }}</h2>
+                  {% endif %}
+                  <h2 class="text-primary font-bold">Rs. {{ game.price|subtract:game.discount_amount }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    
+    <div class="ml-4 mt-5 flex flex-col lg:ml-0 w-full justify-center items-center">
+      <div class="container flex items-center mt-6 mb-4 gap-4">
+        <h2 class="text-2xl ml-10">Newly Added</h2>
+        <a href="#" class="border-2 border-primary px-2 py-1 rounded text-primary hover:bg-primary hover:text-black font-bold">Show more</a>
+      </div>
+
+      <div class="w-full flex-wrap flex gap-8 justify-center">
+        {% for game in new_games %}
+          <div class="container w-[22rem] overflow-hidden bg-gray-800 rounded">
+            <div class="image overflow-hidden relative group">
+              <img src="/media/{{ game.banner }}" alt="" loading="lazy" class="rounded-t aspect-[5/3] w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="h-full opacity-0 transition-opacity duration-500 group-hover:opacity-100 flex absolute top-0 left-0 right-0 bottom-0 hover:bg-gradient-to-t hover:from-black">
+                <div class="container h-full relative flex flex-col justify-center items-center">
+                  <div class="absolute top-2 right-2 text-secondary hover:text-primary text-2xl">
+                    {% if game.id in wishlisted_games %}
+                      <button onclick="removeWishlistItem('{{ game.slug }}')" class="flex items-center gap-3"><i class="remove-wishlist-{{ game.slug }} ph-fill ph-heart-straight"></i></button>
+                    {% else %}
+                      <form method="post" action="{% url 'add_to_wishlist' game.id %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-3"><i class="ph-bold ph-heart-straight"></i></button>
+                      </form>
+                    {% endif %}
+                  </div>
+                  <a href="/game/{{ game.slug }}" class="mx-4 my-6 text-center font-black text-gray-300 hover:text-white">{{ game.display_name }}</a>
+                  <form action="{% url 'add_to_basket' game.id %}" method="post" class="w-full flex justify-center">
+                    {% csrf_token %}
+                    <button type="submit" class="uppercase text-white hover:text-black bg-primary hover:bg-secondary font-bold w-6/12 py-2 text-sm">Add to basket</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="z-99 product-info w-full flex justify-between items-center p-2 text-gray-400">
+              <div class="platform flex items-center gap-1 text-xl">
+                {% if game.is_available_on_windows %}
+                  <i class="ph-fill ph-windows-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_mac %}
+                  <i class="ph-fill ph-apple-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+                {% if game.is_available_on_linux %}
+                  <i class="ph-fill ph-linux-logo hover:text-white cursor-pointer"></i>
+                {% endif %}
+              </div>
+              <div class="pricing flex items-center gap-2 leading-4">
+                {% if game.discount_amount != 0 %}
+                  <a class="bg-gray-700 p-2">-{{ game.discount_amount|percent_round:game.price }}%</a>
+                {% endif %}
+                <div class="flex flex-col text-right">
+                  {% if game.discount_amount != 0 %}
+                    <h2 class="line-through text-[0.8rem]">Rs. {{ game.price }}</h2>
+                  {% endif %}
+                  <h2 class="text-primary font-bold">Rs. {{ game.price|subtract:game.discount_amount }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    let carouselLength = Number("{{featured_games|length}}")
+  <script>
+    let carouselLength = Number('{{featured_games|length}}')
     let carouselPos = 1
     $('.prev-arrow').on('click', () => {
-        carouselSlider(0)
+      carouselSlider(0)
     })
     $('.next-arrow').on('click', () => {
-        carouselSlider(1)
+      carouselSlider(1)
     })
-
+    
     setInterval(() => {
-        carouselSlider(1)
+      carouselSlider(1)
     }, 10_000)
-
+    
     function carouselSlider(val) {
-        $(`.featured-game-${carouselPos}`).toggleClass('flex')
-        $(`.featured-game-${carouselPos}`).toggleClass('hidden')
-        val == 1 ? carouselPos = carouselPos == carouselLength ? 1 :
-            carouselPos + 1 : carouselPos = carouselPos == 1 ? carouselLength : carouselPos - 1
-        $(`.featured-game-${carouselPos}`).toggleClass('flex')
-        $(`.featured-game-${carouselPos}`).toggleClass('hidden')
+      $(`.featured-game-${carouselPos}`).toggleClass('flex')
+      $(`.featured-game-${carouselPos}`).toggleClass('hidden')
+      val == 1 ? (carouselPos = carouselPos == carouselLength ? 1 : carouselPos + 1) : (carouselPos = carouselPos == 1 ? carouselLength : carouselPos - 1)
+      $(`.featured-game-${carouselPos}`).toggleClass('flex')
+      $(`.featured-game-${carouselPos}`).toggleClass('hidden')
     }
+  </script>
 
-</script>
-
-<script>
+  <script>
     function removeWishlistItem(slug) {
-        $.ajax({
-            url: "{% url 'remove_from_wishlist' %}",
-            type: 'POST',
-            data: {
-                'slug': slug,
-                'csrfmiddlewaretoken': '{{csrf_token}}'
-            },
-            success: function(res) {
-                $(`.remove-wishlist-${res['slug']}`).removeClass('ph-fill').addClass('ph-bold')
-            }
-        })
+      $.ajax({
+        url: "{% url 'remove_from_wishlist' %}",
+        type: 'POST',
+        data: {
+          slug: slug,
+          csrfmiddlewaretoken: '{{csrf_token}}'
+        },
+        success: function (res) {
+          $(`.remove-wishlist-${res['slug']}`).removeClass('ph-fill').addClass('ph-bold')
+        }
+      })
     }
-</script>
+  </script>
 {% endblock %}

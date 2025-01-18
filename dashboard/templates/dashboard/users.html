@@ -1,0 +1,83 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+  Users Dashboard | Babal.Store
+{% endblock %}
+{% block dashboard_content %}
+  <section class="container">
+    <div class="filterbox flex justify-between items-center mb-4">
+      <form class="m-0 flex justify-between w-full">
+        <div>
+            <input class="h-8 indent-4 bg-gray-800 outline-none border-none rounded" type="text" placeholder="Search for a user" name="q" value="{{ request.GET.q }}" />
+            <input type="hidden" name="type" id="type" value="{{result_type}}">
+            <button type="submit">Go</button>
+        </div>
+        
+        <button type="submit" onclick="filterAdmin()" 
+        {% if result_type == 'admin' %}
+        class="border-2 border-primary text-black bg-primary font-bold hover:text-primary hover:bg-transparent px-2 py-1 rounded"
+        {% else %}
+        class="border-2 border-primary text-primary font-bold hover:text-black hover:bg-primary px-2 py-1 rounded"
+        {% endif %}
+        >Admin</button>
+    </form>
+    </div>
+    <div class="">
+      {% for user in users %}
+        <div class="flex w-full bg-gray-800 p-4 mb-2 rounded justify-between">
+            <div class="flex gap-2 items-center justify-center">
+                {% if user.is_staff %}
+                <i class="ph ph-user-gear text-2xl"></i>
+                {% else %}
+                <i class="ph ph-user text-2xl"></i>
+                {% endif %}
+                <p class="text-gray-300 min-w-32">@{{user.username}}</p>
+                <p class="text-primary font-bold">{{user.first_name}} {{user.last_name}}</p>
+            </div>
+            <div class="flex gap-2 items-center justify-end">
+                <div class="flex flex-col items-center justify-center">
+                    <p>Last Online</p>
+                    <p class="text-gray-300">{{user.last_login|timesince:current_time }} ago</p>
+                </div>
+                <a href="{% url 'dashboard_manage_user' user.id %}" class="min-w-40 text-right"><i class="ph ph-pencil-simple text-2xl text-primary hover:text-secondary"></i></a>
+            </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-5 flex items-center">
+        <div class="flex items-center justify-between">
+          <a class="px-2" href="?q={{ request.GET.q }}&page=1"><i class="ph ph-caret-double-left"></i></a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={% if users.has_previous %}{{ users.previous_page_number }}{% else %}1{% endif %}">
+            <i class="ph ph-caret-left"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ users.number }}">{{ users.number }}</a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={% if users.has_next %}{{ users.next_page_number }}{% else %}{{ users.paginator.num_pages }}{% endif %}">
+            <i class="ph ph-caret-right"></i>
+          </a>
+          <a class="px-2" href="?q={{ request.GET.q }}&page={{ users.paginator.num_pages }}"><i class="ph ph-caret-double-right"></i></a>
+        </div>
+        <span class="px-2">Go to page</span>
+        <form class="items-center h-fit my-auto flex">
+          <input class="indent-2 w-10 bg-gray-800 outline-none border-none rounded" type="text" name="page" placeholder="{{ users.number }}" />
+          <input type="hidden" name="q" value="{{ request.GET.q }}" />
+          <button class="mx-2 bg-gray-800 hover:bg-gray-700 px-2" type="submit">Go</button>
+        </form>
+      </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    function filterAdmin() {
+        if ($('#type').val() == "admin") {
+            $('#type').val("")
+        } else {
+            $('#type').val("admin")
+        }
+    }
+</script>
+{% block tab_highlight %}
+  <script type="text/javascript">
+    $('.users-tab').addClass('text-secondary')
+    $('.users-tab').addClass('bg-gray-700')
+  </script>
+{% endblock %}
+{% endblock %}

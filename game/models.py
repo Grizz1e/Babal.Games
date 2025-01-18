@@ -3,7 +3,18 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
-import uuid
+from django.db.models import Avg, Count, F, FloatField
+from django.db.models.functions import Cast
+import uuid, os
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+
+class OutsideMediaStorage(FileSystemStorage):
+    def __init__(self, location=None):
+        # Set your custom location outside MEDIA_ROOT here
+        if location is None:
+            location = os.path.join('game_builds')
+        super().__init__(location=location)
 
 
 # Create your models here.
@@ -13,32 +24,73 @@ def banner_upload(instance, filename):
 def screenshot_upload(instance, filename):
     return f'screenshots/{uuid.uuid4()}.{filename.split(".")[-1]}'
 
+def game_build_upload(instance, filename):
+    return f'{uuid.uuid4()}.{filename.split(".")[-1]}'
+
 def unique_order_id():
     return uuid.uuid4()
+
+class NewGameGenre(models.Model):
+    display_name = models.CharField(max_length=100)
+    slug = models.CharField(max_length=50, unique=True)
+    def __str__(self):
+        return self.display_name
 
 class Game(models.Model):
     display_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, max_length=50)
     description = models.TextField(max_length=500, blank=True)
     long_description = models.TextField(default="No description provided", blank=True)
-
-    user_rating = models.FloatField(default=0, validators=[
-        MinValueValidator(0),
-        MaxValueValidator(5)
-    ])
+    genre = models.ManyToManyField(NewGameGenre, blank=True)
 
     banner = models.ImageField(upload_to=banner_upload)
     yt_trailer_id = models.CharField(verbose_name="YouTube trailer ID", max_length=20, blank=True)
-    steam_id = models.CharField(verbose_name="Steam App ID", max_length=10)
+    steam_id = models.CharField(verbose_name="Steam App ID", max_length=10, blank=True)
+
+    licensed_to = models.ManyToManyField(verbose_name="Licensed To", to=User, blank=True)
 
     price = models.FloatField(default=0)
     discount_amount = models.FloatField(default=0)
 
-    copies_sold = models.IntegerField(default=0)
-
     is_available_on_windows = models.BooleanField(default=False)
     is_available_on_linux = models.BooleanField(default=False)
     is_available_on_mac = models.BooleanField(default=False)
+
+    developer = models.CharField(max_length=100, blank=True, null=True)
+    publisher = models.CharField(max_length=100, blank=True, null=True)
+    support_url = models.CharField(max_length=250, blank=True, null=True)
+
+    def get_weighted_rating(self, min_votes:int=10, mean_vote:float=3.5):
+        reviews = self.gamereview_set.all()
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        review_count = reviews.count()
+        
+        if not avg_rating or not review_count:
+            return 0
+        
+        weighted_rating = (
+            (review_count / (review_count + min_votes) * avg_rating) +
+            (min_votes / (review_count + min_votes) * mean_vote)
+        )
+        
+        return round(weighted_rating, 2)
+    
+    @staticmethod
+    def get_top_rated_games(limit=10, min_votes:int=10, mean_vote:float=3.5):
+
+        return Game.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews'),
+            weighted_rating=Cast(
+                (
+                    (F('review_count') / (F('review_count') + min_votes) * F('avg_rating')) +
+                    (min_votes / (F('review_count') + min_votes) * mean_vote)
+                ),
+                FloatField()
+            )
+        ).filter(
+            review_count__gte=min_votes
+        ).order_by('-weighted_rating')[:limit]
 
     def __str__(self):
         return self.display_name
@@ -52,12 +104,27 @@ class GameRating(models.Model):
     two_stars = models.IntegerField(default=0)
     one_stars = models.IntegerField(default=0)
 
+    @property
+    def total_ratings(self):
+        return self.five_stars + self.four_stars + self.three_stars + self.two_stars + self.one_stars
+
+    @property
+    def average_rating(self):
+        total_score = (
+            5 * self.five_stars +
+            4 * self.four_stars +
+            3 * self.three_stars +
+            2 * self.two_stars +
+            1 * self.one_stars
+        )
+        return total_score / self.total_ratings if self.total_ratings > 0 else 0
+
     def __str__(self):
         return self.game.display_name
     
 class GameReview(models.Model):
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='reviews')
     review = models.TextField(max_length=500, blank=True)
     rating = models.IntegerField(validators=[
         MinValueValidator(1),
@@ -91,20 +158,6 @@ class GameScreenshot(models.Model):
         return self.game.display_name
     
 
-class GameOrder(models.Model):
-    order_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE)
-    games = models.ManyToManyField(Game, blank=True)
-    total_price = models.FloatField(default=0, validators=[
-        MinValueValidator(10)
-    ])
-
-    is_payment_successful = models.BooleanField(default=False)
-    order_date = models.DateTimeField(default=timezone.now)
-    pidx = models.CharField(max_length=100, blank=True)
-
-    def __str__(self):
-        return self.buyer.username + " " + str(self.order_id)
 
 class GameVoucher(models.Model):
     voucher_code = models.CharField(max_length=20, unique=True)
@@ -123,35 +176,66 @@ class GameVoucher(models.Model):
 
     def __str__(self):
         return self.voucher_code
-    
-class GameGenre(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
-    action = models.BooleanField()
-    adventure = models.BooleanField()
-    anime = models.BooleanField()
-    fps = models.BooleanField()
-    horror = models.BooleanField()
-    indie = models.BooleanField()
-    open_world = models.BooleanField()
-    racing = models.BooleanField()
-    rpg = models.BooleanField()
-    simulation = models.BooleanField()
-    sports = models.BooleanField()
+class GameBuild(models.Model):
+    game = models.OneToOneField(Game, on_delete=models.CASCADE)
+    zip_file = models.FileField(upload_to=game_build_upload, storage=OutsideMediaStorage)
+    date_added = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.game.display_name
+        return f"{self.id}"
+
+class GameOrder(models.Model):
+    order_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE)
+    games = models.ManyToManyField(Game, blank=True)
+    total_price = models.FloatField(default=0, validators=[
+        MinValueValidator(10)
+    ])
+    voucher = models.ForeignKey(GameVoucher, blank=True, null=True, on_delete=models.SET_NULL)
+    voucher_amount = models.FloatField(default=0)
+
+    STATUS_CHOICES =( 
+        (1, "Pending"),
+        (2, "Completed"),
+        (3, "Cancelled"),
+        (4, "Expired"),
+        (5, "Failed"),
+    )
+    status = models.IntegerField(choices=STATUS_CHOICES)
+
+    is_payment_successful = models.BooleanField(default=False)
+    order_date = models.DateTimeField(default=timezone.now)
+    pidx = models.CharField(max_length=100, blank=True)
+
+    def is_expired(self):
+        """Check if the order should be marked as expired."""
+        if self.status == 1:  # Pending
+            expiration_time = self.order_date + timezone.timedelta(minutes=30)
+            return timezone.now() > expiration_time
+        return False
+
+    def __str__(self):
+        return self.buyer.username + " " + str(self.order_id)
     
-    def get_genres(self):
-        genres = []
-        genre_fields = [
-            'action', 'adventure', 'anime', 'fps', 'horror', 'indie', 
-            'open_world', 'racing', 'rpg', 'simulation', 'sports'
-        ]
-        for field in genre_fields:
-            if getattr(self, field):
-                genres.append(field.replace("_", " ").title())
-        return genres
+class RecommendedSystemRequirement(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    os = models.CharField(max_length=250)
+    processor = models.CharField(max_length=500)
+    memory = models.CharField(max_length=250)
+    graphics = models.CharField(max_length=250)
+    storage = models.CharField(max_length=250)
+    additional_note = models.TextField(max_length=1000, blank=True)
+
+class MinSystemRequirement(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    os = models.CharField(max_length=250)
+    processor = models.CharField(max_length=500)
+    memory = models.CharField(max_length=250)
+    graphics = models.CharField(max_length=250)
+    storage = models.CharField(max_length=250)
+    additional_note = models.TextField(max_length=1000, blank=True)
+
 
 @receiver(models.signals.post_save, sender=Game)
 def create_game_related_data(sender, instance, created, **kwargs):
